@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %} Edit User {% endblock %}
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="container">
+        <div class="form-section">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" name="username" required />
+            <label for="desc" class="form-label">Description</label>
+            <input type="text" class="form-control" name="desc" required />
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+        <div class="cards-section">
+            {% for usuario in usuarios %}
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <input type="radio" name="selected_user" value="{{ usuario.id }}" required>
+                    <h5 class="card-title">{{ usuario.username }}</h5>
+                    <p class="card-text">{{ usuario.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</form>
+{% endblock %}
