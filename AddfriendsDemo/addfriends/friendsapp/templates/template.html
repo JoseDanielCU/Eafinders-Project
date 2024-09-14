@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EAFINDERS{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="navbar">
+                <a href="/" class="brand">EAFINDERS</a>
+                <ul class="nav-links">
+                    <li><a href="Inicio.html">Home</a></li>
+                    <li><a href="Amigos.html">Friends</a></li>
+                    <li><a href="Gente.html">People</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Content for each specific page will go here -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 EAFINDERS. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
