@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %} Home page {% endblock %}
+{% block content %}
+<p></p>
+<h3><strong>Report Log</strong></h3>
+<p>This is the Report page of EAFINDERS.</p>
+<h3><strong>Report comments</strong></h3>
+<div class="container">
+    <div class="list-group">
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <button class="btn btn-primary btn-sm">User1</button>
+            <p class="mb-0">"You're too dumb to be in this class."</p>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <button class="btn btn-primary btn-sm">User2</button>
+            <p class="mb-0">"This place would be better without this group."</p>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <button class="btn btn-sm" style="color: red; background-color: gray;">Reported</button>
+            <p class="mb-0">"You're the worst person I've ever met."</p>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <button class="btn btn-primary btn-sm">User4</button>
+            <p class="mb-0">"If you say that again, you'll regret it."</p>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <button class="btn btn-primary btn-sm">User5</button>
+            <p class="mb-0">"You are completely useless, why do you even bother?"</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
