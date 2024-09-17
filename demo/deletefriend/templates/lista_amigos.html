@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} Lista de Amigos {% endblock %}
+
+{% block content %}
+    <h1>Lista de Amigos</h1>
+    <ul>
+        {% for amigo in amigos %}
+            <li>{{ amigo.nombre }}
+                <form action="{% url 'eliminar_amigo' amigo.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
