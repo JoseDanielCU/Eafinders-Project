@@ -1,0 +1,12 @@
+{% extends 'Template.html' %}
+{% block title %} Edición Perfil {% endblock %}
+{% block content %}
+  <h2>Editar Perfil</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+  </form>
+
+  <a href="{% url 'profile' user_id=request.user.id %}">Cancelar</a>
+{% endblock %}

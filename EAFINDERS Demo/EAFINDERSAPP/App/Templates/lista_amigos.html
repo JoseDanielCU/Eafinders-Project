@@ -1,0 +1,20 @@
+{% extends 'template.html' %}
+
+{% block title %} Lista de Amigos {% endblock %}
+
+{% block content %}
+    <h1>Lista de Amigos</h1>
+    <ul class="list-group">
+        {% for amigo in amigos %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ amigo.nombres }} {{ amigo.apellidos }} ({{ amigo.email_institucional }})
+                <form method="POST" action="{% url 'eliminar_amigo' amigo.id %}" class="d-inline-block" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este amigo?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No tienes amigos aceptados.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

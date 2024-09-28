@@ -1,0 +1,26 @@
+{% extends 'Template.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+   <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <h2 class="text-center mt-5">Iniciar Sesión</h2>
+                <form method="POST" class="p-4 border rounded shadow-sm bg-light">
+                    {% csrf_token %}
+                    {{ form.as_p  }}
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Iniciar Sesión</button>
+                </form>
+
+                {% if messages %}
+                    <div class="mt-3">
+                        {% for message in messages %}
+                            <div class="alert alert-danger">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

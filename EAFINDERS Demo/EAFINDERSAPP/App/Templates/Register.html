@@ -1,0 +1,94 @@
+{% extends 'Template.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <h2 class="text-center mt-5">Registro de Usuario</h2>
+        <form method="post" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
+            {% csrf_token %}
+
+            <div class="form-group row">
+                <label for="id_nombres" class="col-sm-4 col-form-label">Nombres:</label>
+                <div class="col-sm-8">
+                    {{ form.nombres }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_apellidos" class="col-sm-4 col-form-label">Apellidos:</label>
+                <div class="col-sm-8">
+                    {{ form.apellidos }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_email_institucional" class="col-sm-4 col-form-label">Email institucional:</label>
+                <div class="col-sm-8">
+                    {{ form.email_institucional }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_password" class="col-sm-4 col-form-label">Password:</label>
+                <div class="col-sm-8">
+                    {{ form.password }}
+                </div>
+            </div>
+
+            <!-- Aquí agregamos de nuevo el campo de confirmación de contraseña -->
+            <div class="form-group row">
+                <label for="id_confirm_password" class="col-sm-4 col-form-label">Confirmar password:</label>
+                <div class="col-sm-8">
+                    {{ form.confirm_password }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_foto_perfil" class="col-sm-4 col-form-label">Foto perfil:</label>
+                <div class="col-sm-8">
+                    {{ form.foto_perfil }}
+                    <img id="preview-image" src="#" alt="Previsualización" class="img-fluid mt-2" style="display: none; max-height: 200px;" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_biografia" class="col-sm-4 col-form-label">Biografía:</label>
+                <div class="col-sm-8">
+                    {{ form.biografia }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_carrera" class="col-sm-4 col-form-label">Carrera:</label>
+                <div class="col-sm-8">
+                    {{ form.carrera }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="id_semestre" class="col-sm-4 col-form-label">Semestre:</label>
+                <div class="col-sm-8">
+                    {{ form.semestre }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3">Registrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Previsualización de la imagen
+    document.getElementById("id_foto_perfil").addEventListener("change", function(event) {
+      var reader = new FileReader();
+      reader.onload = function(){
+        var output = document.getElementById('preview-image');
+        output.src = reader.result;
+        output.style.display = 'block';
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    });
+  </script>
+{% endblock %}

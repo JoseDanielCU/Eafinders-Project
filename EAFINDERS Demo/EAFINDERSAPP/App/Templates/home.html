@@ -1,0 +1,21 @@
+{% extends 'template.html' %}
+
+{% block title %} Home {% endblock %}
+{% block content %}
+    <h1 class="display-4 text-center">Home</h1>
+    <p class="lead text-center">Bienvenido a EAFINDERS</p>
+
+    <h2 class="mt-5">Usuarios Registrados:</h2>
+    <ul class="list-unstyled">
+        {% for user in users %}
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <span class="h5">{{ user.nombres }} {{ user.apellidos }}</span>
+                <a href="{% url 'profile' user.id %}">
+                    <button class="btn btn-primary">Ver Perfil</button>
+                </a>
+            </li>
+        {% empty %}
+            <li class="h5">No hay otros usuarios registrados.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

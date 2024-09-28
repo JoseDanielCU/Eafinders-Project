@@ -1,0 +1,39 @@
+{% extends 'template.html' %}
+{% load static %}  <!-- Asegúrate de cargar la etiqueta estática aquí -->
+
+{% block title %} Perfil de {{ user.nombres }} {% endblock %}
+{% block extra_styles %}
+<style>
+    .profile-pic {
+        width: 150px; /* Ajusta el tamaño según tus necesidades */
+        height: 150px; /* Ajusta el tamaño según tus necesidades */
+        object-fit: cover;
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            {% if user.foto_perfil %}
+                <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-pic">
+            {% else %}
+                <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-pic">
+            {% endif %}
+            <h2>{{ user.nombres }} {{ user.apellidos }}</h2>
+            <p class="text-muted">{{ user.carrera }}</p>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Información Personal</h5>
+                    <p><strong>Email:</strong> {{ user.email_institucional }}</p>
+                    <p><strong>Semestre:</strong> {{ user.semestre }}</p>
+                    <p><strong>Biografía:</strong> {{ user.biografia }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
