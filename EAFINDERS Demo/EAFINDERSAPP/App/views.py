@@ -13,7 +13,6 @@ def logout_user(request):
         logout(request)
         return redirect('login')  # Redirect to the login page
     return redirect('home')  # If not POST, redirect to home or another page
-
 @login_required
 def profile_view(request, user_id):
     """View to display a user's profile."""
