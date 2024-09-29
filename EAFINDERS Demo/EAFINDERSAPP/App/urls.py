@@ -14,6 +14,10 @@ urlpatterns = [
     path('profile/<int:user_id>/', views.profile_view, name='profile'),
     path('Notificaciones/', views.Notificaciones, name='Notificaciones'),
     path('buscar/', views.buscar_usuarios, name='buscar_usuarios'),
+    path('enviar_solicitud_amistad/<int:user_id>/', views.enviar_solicitud_amistad,name='enviar_solicitud_amistad'),
+    path('aceptar_solicitud_amistad/<int:solicitud_id>/', views.aceptar_solicitud_amistad,name='aceptar_solicitud_amistad'),
+    path('rechazar_solicitud_amistad/<int:solicitud_id>/', views.rechazar_solicitud_amistad, name='rechazar_solicitud_amistad'),
+    path('eliminar_amistad/<int:user_id>/', views.eliminar_amistad, name='eliminar_amistad'),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

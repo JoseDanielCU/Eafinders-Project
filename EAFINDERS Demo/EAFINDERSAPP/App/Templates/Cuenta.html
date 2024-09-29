@@ -13,6 +13,14 @@
     .profile-info {
         margin-top: 20px;
     }
+    .friend-list {
+        margin-top: 20px;
+    }
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
 </style>
 {% endblock %}
 
@@ -44,6 +52,38 @@
                             {% csrf_token %}
                         </form>
                     </div>
+                </div>
+            </div>
+
+            <!-- Sección de lista de amigos -->
+ <div class="row mt-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mis Amigos</h5>
+
+                    {% if amigos %}
+                        <div class="row">
+                            {% for amigo in amigos %}
+                                <div class="col-6 col-md-4 mb-4 text-center">
+                                    <a href="{% url 'profile' amigo.id %}" class="text-decoration-none text-dark">
+                                        <div class="card shadow-sm">
+                                            {% if amigo.foto_perfil %}
+                                                <img src="{{ amigo.foto_perfil.url }}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ amigo.nombres }}" style="width: 100px; height: 100px; object-fit: cover;">
+                                            {% else %}
+                                                <img src="{% static 'default_profile.jpg' %}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ amigo.nombres }}" style="width: 100px; height: 100px; object-fit: cover;">
+                                            {% endif %}
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ amigo.nombres }} {{ amigo.apellidos }}</h6>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No tienes amigos añadidos.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

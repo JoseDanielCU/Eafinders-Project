@@ -1,7 +1,27 @@
 {% extends 'template.html' %}
 
-{% block title %} Notificaciones {% endblock %}
+{% block title %}Notificaciones{% endblock %}
 
 {% block content %}
+<h2>Solicitudes de Amistad</h2>
 
+{% if solicitudes %}
+    <ul>
+        {% for solicitud in solicitudes %}
+            <li>
+                {{ solicitud.sender.nombres }} {{ solicitud.sender.apellidos }} te ha enviado una solicitud de amistad.
+                <form method="post" action="{% url 'aceptar_solicitud_amistad' solicitud.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Aceptar</button>
+                </form>
+                <form method="post" action="{% url 'rechazar_solicitud_amistad' solicitud.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Rechazar</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No tienes solicitudes de amistad pendientes.</p>
+{% endif %}
 {% endblock %}

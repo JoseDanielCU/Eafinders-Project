@@ -1,4 +1,4 @@
-from .models import Usuario
+from .models import Usuario, Amistad
 from django.contrib.auth import login as auth_login, authenticate, logout
 from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm, BuscarUsuarioForm
 from django.contrib.auth.hashers import make_password
@@ -13,20 +13,48 @@ def logout_user(request):
         logout(request)
         return redirect('login')  # Redirect to the login page
     return redirect('home')  # If not POST, redirect to home or another page
-@login_required
-def profile_view(request, user_id):
-    """View to display a user's profile."""
-    user = get_object_or_404(Usuario, id=user_id)  # Obtén el usuario usando el ID pasado en la URL
-    return render(request, 'Profiles.html', {'user': user})  # Pasa el usuario a la plantilla
 
 @login_required
-def Notificaciones(request):
-    """View to show notifications for friendship requests."""
-    return render(request, 'notificaciones.html')
+def profile_view(request, user_id):
+    profile_user = get_object_or_404(Usuario, id=user_id)
+
+    # Verifica si ya hay una solicitud enviada o recibida
+    solicitud_enviada = Amistad.objects.filter(user1=request.user, user2=profile_user, estado='pendiente').exists()
+    solicitud_recibida = Amistad.objects.filter(user1=profile_user, user2=request.user, estado='pendiente').first()
+    son_amigos = Amistad.objects.filter(
+        (Q(user1=request.user) & Q(user2=profile_user)) |
+        (Q(user1=profile_user) & Q(user2=request.user)),
+        estado='aceptada'
+    ).exists()
+
+    contexto = {
+        'profile_user': profile_user,
+        'solicitud_enviada': solicitud_enviada,
+        'solicitud_recibida': solicitud_recibida,  # Pasamos la solicitud recibida si existe
+        'son_amigos': son_amigos,
+    }
+
+    return render(request, 'Profiles.html', contexto)
+
 
 @login_required
 def account(request):
-    return render(request, 'Cuenta.html')
+    # Obtener las amistades donde el usuario sea user1 o user2 y la solicitud haya sido aceptada
+    amistades = Amistad.objects.filter(
+        Q(user1=request.user, estado='aceptada') | Q(user2=request.user, estado='aceptada')
+    )
+
+    amigos = []
+    for amistad in amistades:
+        # Si el usuario es user1, el amigo es user2, y viceversa
+        if amistad.user1 == request.user:
+            amigos.append(amistad.user2)
+        else:
+            amigos.append(amistad.user1)
+
+    return render(request, 'Cuenta.html', {'amigos': amigos})
+
+
 def home(request):
     """View to display home page with all users except the logged-in user."""
     users = Usuario.objects.exclude(id=request.user.id)
@@ -34,18 +62,18 @@ def home(request):
 
 @login_required
 def EditProfile(request):
-    usuario = request.user  # Obtenemos el usuario actual
+    usuario = request.user  # Get the current user
 
     if request.method == 'POST':
         form = EditarPerfilForm(request.POST, request.FILES, instance=usuario)
         if form.is_valid():
-            form.save()  # Guardamos los cambios
+            form.save()  # Save the changes
             messages.success(request, 'Perfil actualizado correctamente.')
-            return redirect('Cuenta')  # Redirigir al perfil del usuario
+            return redirect('Cuenta')  # Redirect to user profile
         else:
             messages.error(request, 'Por favor corrige los errores a continuación.')
     else:
-        form = EditarPerfilForm(instance=usuario)  # Inicializamos el formulario con los datos del usuario actual
+        form = EditarPerfilForm(instance=usuario)  # Initialize the form with the current user data
 
     return render(request, 'EditProfile.html', {'form': form})
 
@@ -86,21 +114,20 @@ def registro_usuario(request):
 
     return render(request, 'Register.html', {'form': form})
 
-
 def buscar_usuarios(request):
     query = request.GET.get('query', None)
     usuarios = None
     mensaje = None
 
     if query:
-        # Realizamos la búsqueda en los campos de nombre, apellido, o email
+        # Search in the fields of name, surname, or email
         usuarios = Usuario.objects.filter(
             Q(nombres__icontains=query) |
             Q(apellidos__icontains=query) |
             Q(email_institucional__icontains=query)
         )
 
-        # Si no hay resultados
+        # If no results
         if not usuarios.exists():
             mensaje = "No se encontraron coincidencias."
 
@@ -110,3 +137,56 @@ def buscar_usuarios(request):
     }
 
     return render(request, 'buscar_usuarios.html', context)
+
+@login_required
+def enviar_solicitud_amistad(request, user_id):
+    if request.method == 'POST':
+        receiver = get_object_or_404(Usuario, id=user_id)
+
+        # Verifica si ya existe una amistad o solicitud
+        if not Amistad.objects.filter(
+            (Q(user1=request.user) & Q(user2=receiver)) |
+            (Q(user1=receiver) & Q(user2=request.user))
+        ).exists():
+            # Crea la solicitud de amistad en estado pendiente
+            Amistad.objects.create(user1=request.user, user2=receiver, estado='pendiente')
+
+        return redirect('profile', user_id=receiver.id)
+    return redirect('home') # Redirect if not a POST
+
+def aceptar_solicitud_amistad(request, solicitud_id):
+    solicitud = get_object_or_404(Amistad, id=solicitud_id)
+    solicitud.aceptar_solicitud()
+    return redirect('Notificaciones')
+
+@login_required
+def rechazar_solicitud_amistad(request, solicitud_id):
+    amistad = get_object_or_404(Amistad, id=solicitud_id, user2=request.user, estado='pendiente')
+    amistad.estado = 'rechazada'
+    amistad.save()
+
+    return redirect('notificaciones')
+
+@login_required
+def eliminar_amistad(request, user_id):
+    amigo = get_object_or_404(Usuario, id=user_id)
+    amistad = Amistad.objects.filter(
+        (Q(user1=request.user) & Q(user2=amigo)) | (Q(user1=amigo) & Q(user2=request.user))
+    )
+    if amistad.exists():
+        amistad.delete()
+        messages.success(request, f'Amistad eliminada con {amigo}.')
+    else:
+        messages.error(request, 'No tienes una amistad con este usuario.')
+
+    return redirect('profile', user_id=user_id)
+
+@login_required
+def Notificaciones(request):
+    # Get pending friendship requests for the current user
+    solicitudes = Amistad.objects.filter(user2=request.user, estado='pendiente')
+
+    contexto = {
+        'solicitudes': solicitudes
+    }
+    return render(request, 'Notificaciones.html', contexto)
