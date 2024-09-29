@@ -69,9 +69,13 @@
                     {% else %}
                         <img src="{% static 'Default_profile.jpg' %}" alt="Foto de perfil">
                     {% endif %}
-                    <a href="{% url 'profile' usuario.id %}">
-                        {{ usuario.nombres }} {{ usuario.apellidos }} - {{ usuario.email_institucional }}
-                    </a>
+
+                    <!-- Redirigir a 'Cuenta' si el usuario encontrado es el usuario autenticado -->
+                    {% if user.id == usuario.id %}
+                        <a href="{% url 'Cuenta' %}">Tu Perfil ({{ usuario.nombres }} {{ usuario.apellidos }})</a>
+                    {% else %}
+                        <a href="{% url 'profile' usuario.id %}">{{ usuario.nombres }} {{ usuario.apellidos }} - {{ usuario.email_institucional }}</a>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

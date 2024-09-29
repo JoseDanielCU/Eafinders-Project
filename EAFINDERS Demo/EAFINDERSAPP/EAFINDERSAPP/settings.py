@@ -18,7 +18,7 @@ LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = '/login/' # Redirigir a la página de login si el usuario no está autenticado
 AUTH_USER_MODEL = 'App.Usuario'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
+ASGI_APPLICATION = 'EAFINDERSAPP.asgi.application'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'App.context_processors.notificaciones_count',
             ],
         },
     },

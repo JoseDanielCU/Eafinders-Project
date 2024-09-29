@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html LANG="es">
+<html lang="es">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -27,9 +27,15 @@
             border-radius: 50%;
         }
 
-        /* Botón del modo oscuro */
+        /* Estilos del icono del modo oscuro */
         #dark-mode-toggle {
             cursor: pointer;
+            background: none; /* Sin fondo */
+            border: none; /* Sin borde */
+            padding: 0; /* Sin padding */
+            color: inherit; /* Heredar color del texto */
+            font-size: 1.5rem; /* Tamaño del icono */
+            margin-left: 10px; /* Espaciado a la izquierda */
         }
 
         .container.dark-mode {
@@ -68,7 +74,9 @@
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <button id="dark-mode-toggle" class="btn btn-outline-light">Modo Oscuro</button>
+                        <span id="dark-mode-toggle">
+                            <i class="fas fa-sun" id="toggle-icon"></i> <!-- Icono de sol por defecto -->
+                        </span>
                     </li>
                 </ul>
                 <!-- Barra de Búsqueda -->
@@ -90,7 +98,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'Notificaciones' %}">Notificaciones</a>
+                            <a class="nav-link position-relative" href="{% url 'Notificaciones' %}">
+                                <i class="fas fa-bell"></i> <!-- Icono de campana -->
+                                {% if notificaciones_count > 0 %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ notificaciones_count }}
+                                        <span class="visually-hidden">notificaciones no leídas</span>
+                                    </span>
+                                {% endif %}
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'lista_conversaciones' %}">Chats</a>
@@ -132,20 +148,23 @@
             const isDarkMode = localStorage.getItem('dark-mode') === 'true';
             const body = document.body;
             const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const toggleIcon = document.getElementById('toggle-icon');
 
             // Aplicar modo oscuro si está habilitado
             if (isDarkMode) {
                 body.classList.add('dark-mode');
-                darkModeToggle.textContent = 'Modo Claro';
+                toggleIcon.classList.remove('fa-sun'); // Cambiar el icono a luna
+                toggleIcon.classList.add('fa-moon');
             }
 
-            // Cambiar entre modo claro y oscuro al hacer clic en el botón
+            // Cambiar entre modo claro y oscuro al hacer clic en el icono
             darkModeToggle.addEventListener('click', function() {
                 body.classList.toggle('dark-mode');
                 const isDarkModeEnabled = body.classList.contains('dark-mode');
 
-                // Cambiar el texto del botón
-                darkModeToggle.textContent = isDarkModeEnabled ? 'Modo Claro' : 'Modo Oscuro';
+                // Cambiar el icono del botón
+                toggleIcon.classList.toggle('fa-sun', !isDarkModeEnabled);
+                toggleIcon.classList.toggle('fa-moon', isDarkModeEnabled);
 
                 // Guardar preferencia en el almacenamiento local
                 localStorage.setItem('dark-mode', isDarkModeEnabled);

@@ -22,5 +22,4 @@ urlpatterns = [
     path('chat/<int:amigo_id>/', views.chat_view, name='chat_view'),
     path('chat/<int:amigo_id>/obtener-mensajes/', views.obtener_mensajes, name='obtener_mensajes'),
 
-
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

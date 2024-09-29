@@ -1,11 +1,50 @@
 {% extends 'Template.html' %}
 
+{% block extra_styles %}
+<style>
+    /* Estilos del modo oscuro */
+    body.dark-mode .register-form-container {
+        background-color: #2a2a2a; /* Fondo oscuro para la caja del formulario */
+        color: #ffffff; /* Color del texto en modo oscuro */
+        border-color: #444; /* Borde más oscuro */
+    }
+
+    body.dark-mode .register-form-container input,
+    body.dark-mode .register-form-container select {
+        background-color: #3a3a3a; /* Fondo oscuro para los campos de entrada */
+        color: #ffffff; /* Color del texto */
+        border: 1px solid #555; /* Borde más oscuro */
+    }
+
+    body.dark-mode .register-form-container input::placeholder,
+    body.dark-mode .register-form-container select {
+        color: #cccccc; /* Color de los placeholders en modo oscuro */
+    }
+
+    body.dark-mode .register-form-container button {
+        background-color: #007bff; /* Color del botón */
+        border: none; /* Sin borde */
+        color: #fff; /* Texto del botón */
+    }
+
+    body.dark-mode .alert {
+        background-color: #ff4d4d; /* Fondo rojo para alertas */
+        color: #fff; /* Color del texto en alertas */
+    }
+
+    /* Transición suave para cambio de modo */
+    .register-form-container, .alert, input, select, button {
+        transition: background-color 0.3s, color 0.3s; /* Transiciones para el cambio de modo */
+    }
+</style>
+{% endblock %}
+
 {% block content %}
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
         <h2 class="text-center mt-5">Registro de Usuario</h2>
-        <form method="post" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
+        <form method="post" enctype="multipart/form-data" class="p-4 border rounded shadow-sm register-form-container">
             {% csrf_token %}
 
             <div class="form-group row">
