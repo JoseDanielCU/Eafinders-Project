@@ -1,13 +1,54 @@
 {% extends 'template.html' %}
 {% load static %}
 
-{% block title %} Perfil de {{ profile_user.nombres }} {% endblock %}
+{% block title %}Perfil de {{ profile_user.nombres }}{% endblock %}
 {% block extra_styles %}
 <style>
     .profile-pic {
-        width: 150px; /* Ajusta el tamaño según tus necesidades */
-        height: 150px; /* Ajusta el tamaño según tus necesidades */
+        width: 150px;
+        height: 150px;
         object-fit: cover;
+    }
+
+    /* Estilos generales para el modo oscuro */
+    body.dark-mode .profile-header {
+        background-color: #1c1c1c;
+        color: #ffffff;
+    }
+
+    body.dark-mode .card {
+        background-color: #2a2a2a;
+        color: #ffffff;
+    }
+
+    body.dark-mode .list-group-item {
+        background-color: #2a2a2a;
+        color: #ffffff;
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    body.dark-mode .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    body.dark-mode .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    body.dark-mode .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    /* Color para el texto de la carrera */
+    body.dark-mode .career-text {
+        color: #d1d1d1; /* Color claro para el modo oscuro */
     }
 </style>
 {% endblock %}
@@ -15,14 +56,14 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-4 text-center">
+        <div class="col-md-4 text-center profile-header">
             {% if profile_user.foto_perfil %}
                 <img src="{{ profile_user.foto_perfil.url }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-pic">
             {% else %}
                 <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-pic">
             {% endif %}
             <h2>{{ profile_user.nombres }} {{ profile_user.apellidos }}</h2>
-            <p class="text-muted">{{ profile_user.carrera }}</p>
+            <p class="career-text">{{ profile_user.carrera }}</p> <!-- Aplicar clase para el texto de la carrera -->
         </div>
         <div class="col-md-8">
             <div class="card">
@@ -45,17 +86,16 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-success">Aceptar Solicitud</button>
                         </form>
-                            <form method="post" action="{% url 'rechazar_solicitud_amistad' solicitud_recibida.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Rechazar Solicitud</button>
-                            </form>
+                        <form method="post" action="{% url 'rechazar_solicitud_amistad' solicitud_recibida.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Rechazar Solicitud</button>
+                        </form>
                     {% else %}
                         <form method="post" action="{% url 'enviar_solicitud_amistad' profile_user.id %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-primary">Enviar Solicitud de Amistad</button>
                         </form>
                     {% endif %}
-
                 </div>
             </div>
         </div>

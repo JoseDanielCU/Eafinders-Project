@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}Mi Cuenta{% endblock %}
+
 {% block extra_styles %}
 <style>
     .profile-header {
@@ -20,6 +21,29 @@
         width: 150px;
         height: 150px;
         object-fit: cover;
+    }
+
+    /* Estilos para el modo oscuro */
+    .dark-mode .profile-header {
+        background-color: #2c2c2c; /* Fondo oscuro para el encabezado del perfil */
+    }
+    .dark-mode .text-muted {
+        color: #b0b0b0; /* Color de texto atenuado en modo oscuro */
+    }
+    .dark-mode .card {
+        background-color: #1c1c1c; /* Fondo de la tarjeta en modo oscuro */
+        border-color: #333; /* Color del borde de la tarjeta */
+    }
+    .dark-mode .card-title {
+        color: #ffffff; /* Título de la tarjeta en modo oscuro */
+    }
+    .dark-mode .list-group-item {
+        background-color: #2c2c2c; /* Fondo de los elementos de la lista en modo oscuro */
+        color: #ffffff; /* Texto blanco en modo oscuro */
+    }
+    .dark-mode .btn-primary {
+        background-color: #007bff; /* Color del botón en modo oscuro */
+        border-color: #007bff; /* Borde del botón */
     }
 </style>
 {% endblock %}
@@ -56,37 +80,40 @@
             </div>
 
             <!-- Sección de lista de amigos -->
- <div class="row mt-5">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Mis Amigos</h5>
+            <div class="row mt-5">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Mis Amigos</h5>
 
-                    {% if amigos %}
-                        <div class="row">
-                            {% for amigo in amigos %}
-                                <div class="col-6 col-md-4 mb-4 text-center">
-                                    <a href="{% url 'profile' amigo.id %}" class="text-decoration-none text-dark">
-                                        <div class="card shadow-sm">
-                                            {% if amigo.foto_perfil %}
-                                                <img src="{{ amigo.foto_perfil.url }}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ amigo.nombres }}" style="width: 100px; height: 100px; object-fit: cover;">
-                                            {% else %}
-                                                <img src="{% static 'default_profile.jpg' %}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ amigo.nombres }}" style="width: 100px; height: 100px; object-fit: cover;">
-                                            {% endif %}
-                                            <div class="card-body">
-                                                <h6 class="card-title">{{ amigo.nombres }} {{ amigo.apellidos }}</h6>
-                                            </div>
+                            {% if amigos %}
+                                <div class="row">
+                                    {% for amigo in amigos %}
+                                        <div class="col-6 col-md-4 mb-4 text-center">
+                                            <a href="{% url 'profile' amigo.id %}" class="text-decoration-none text-dark">
+                                                <div class="card shadow-sm">
+                                                    {% if amigo.foto_perfil %}
+                                                        <img src="{{ amigo.foto_perfil.url }}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ amigo.nombres }}" style="width: 100px; height: 100px; object-fit: cover;">
+                                                    {% else %}
+                                                        <img src="{% static 'default_profile.jpg' %}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ amigo.nombres }}" style="width: 100px; height: 100px; object-fit: cover;">
+                                                    {% endif %}
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">{{ amigo.nombres }} {{ amigo.apellidos }}</h6>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <!-- Enlace para el chat -->
+                                            <a href="{% url 'chat_view' amigo.id %}" class="btn btn-outline-primary mt-2">Chatear</a>
                                         </div>
-                                    </a>
+                                    {% endfor %}
                                 </div>
-                            {% endfor %}
+                            {% else %}
+                                <p class="text-muted">No tienes amigos añadidos.</p>
+                            {% endif %}
                         </div>
-                    {% else %}
-                        <p class="text-muted">No tienes amigos añadidos.</p>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

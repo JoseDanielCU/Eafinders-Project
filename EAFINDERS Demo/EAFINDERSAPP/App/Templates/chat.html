@@ -1,0 +1,178 @@
+{% extends 'Template.html' %}
+{% block title %}Chat con {{ amigo.nombres }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Estilos para el contenedor del chat */
+    #chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+    }
+
+    #chat {
+        border: 1px solid #ccc;
+        padding: 20px;
+        height: 400px;
+        overflow-y: scroll;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        transition: background-color 0.3s;
+    }
+
+    /* Mensajes enviados por el usuario */
+    .mensaje-enviado {
+        text-align: right;
+        margin-bottom: 15px;
+        background-color: #d1f7c4;
+        padding: 15px;
+        border-radius: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+        font-size: 16px;
+        margin-left: auto;
+    }
+
+    /* Mensajes recibidos */
+    .mensaje-recibido {
+        text-align: left;
+        margin-bottom: 15px;
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+        font-size: 16px;
+        margin-right: auto;
+    }
+
+    /* Estilos del formulario */
+    #mensajeForm {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    textarea {
+        flex: 1;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        resize: none;
+        font-size: 16px;
+    }
+
+    button {
+        margin-left: 10px;
+        padding: 15px 25px;
+        border: none;
+        background-color: #4CAF50; /* Mantener el color de fondo original */
+        color: white;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    /* Estilos para el modo oscuro */
+    .dark-mode #chat {
+        background-color: #2c2c2c; /* Fondo oscuro del chat */
+    }
+
+    .dark-mode .mensaje-enviado {
+        background-color: #4a8a4a; /* Color de los mensajes enviados en modo oscuro */
+        color: #ffffff; /* Texto blanco para los mensajes enviados */
+    }
+
+    .dark-mode .mensaje-recibido {
+        background-color: #444; /* Color de los mensajes recibidos en modo oscuro */
+        color: #ffffff; /* Texto blanco para los mensajes recibidos */
+    }
+
+    .dark-mode textarea {
+        background-color: #555; /* Fondo oscuro para el textarea */
+        color: #ffffff; /* Texto blanco en el textarea */
+        border: 1px solid #777; /* Borde del textarea en modo oscuro */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="chat-container">
+    <div id="chat">
+        <!-- Aquí se mostrarán los mensajes -->
+        {% for mensaje in mensajes %}
+            {% if mensaje.remitente == request.user %}
+                <div class="mensaje-enviado">
+                    <strong>Yo:</strong> {{ mensaje.contenido }}
+                </div>
+            {% else %}
+                <div class="mensaje-recibido">
+                    <strong>{{ mensaje.remitente.nombres }}:</strong> {{ mensaje.contenido }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <form id="mensajeForm">
+        {% csrf_token %}
+        <textarea id="contenido" placeholder="Escribe tu mensaje"></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    const amigoId = {{ amigo.id }}; // Obtener el ID del amigo desde el contexto de Django
+
+    function cargarMensajes() {
+        $.ajax({
+            url: '/chat/' + amigoId + '/obtener-mensajes/',
+            method: 'GET',
+            success: function(data) {
+                $('#chat').empty(); // Limpiar el área del chat
+                data.forEach(function(mensaje) {
+                    // Mostrar el nombre del remitente junto al mensaje
+                    if (mensaje.remitente === '{{ request.user.nombres }}') { // Asegúrate de usar el campo correcto
+                        $('#chat').append('<div class="mensaje-enviado"><strong>Yo:</strong> ' + mensaje.contenido + '</div>');
+                    } else {
+                        $('#chat').append('<div class="mensaje-recibido"><strong>' + mensaje.remitente + ':</strong> ' + mensaje.contenido + '</div>');
+                    }
+                });
+                $('#chat').scrollTop($('#chat')[0].scrollHeight); // Desplazar hacia abajo
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al obtener mensajes:', error);
+            }
+        });
+    }
+
+    // Cargar mensajes al cargar la página
+    cargarMensajes();
+
+    // Cargar mensajes cada 2 segundos
+    setInterval(cargarMensajes, 2000);
+
+    $('#mensajeForm').on('submit', function(e) {
+        e.preventDefault(); // Evitar el envío del formulario
+
+        $.ajax({
+            url: '/chat/' + amigoId + '/', // Utiliza la URL de tu vista
+            method: 'POST',
+            data: {
+                contenido: $('#contenido').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}' // Asegúrate de incluir el token CSRF
+            },
+            success: function() {
+                $('#contenido').val(''); // Limpiar el campo de entrada
+                cargarMensajes(); // Recargar los mensajes
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al enviar el mensaje:', error);
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

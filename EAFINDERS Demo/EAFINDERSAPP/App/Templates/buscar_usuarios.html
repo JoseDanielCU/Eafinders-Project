@@ -9,7 +9,9 @@
         display: flex;
         align-items: center;
         padding: 10px;
+        transition: background-color 0.3s;
     }
+
     .user-list-item img {
         width: 50px;
         height: 50px;
@@ -17,19 +19,40 @@
         border-radius: 50%;
         margin-right: 15px;
     }
+
     .user-list-item a {
         text-decoration: none;
         color: #000;
+        transition: color 0.3s;
     }
+
     .user-list-item a:hover {
         text-decoration: underline;
+    }
+
+    /* Estilos para el modo oscuro */
+    body.dark-mode .user-list-item {
+        background-color: #2a2a2a; /* Fondo oscuro */
+        color: #ffffff; /* Texto claro */
+    }
+
+    body.dark-mode .user-list-item a {
+        color: #ffffff; /* Texto de enlace claro */
+    }
+
+    body.dark-mode .user-list-item a:hover {
+        color: #007bff; /* Color del enlace al pasar el ratón */
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
     <!-- Barra de búsqueda -->
-    <form class="d-flex mb-4" method="GET" action="{% url 'buscar_usuarios' %}">
+    <form class="d-flex search-bar" method="GET" action="{% url 'buscar_usuarios' %}">
         <input class="form-control me-2" type="search" name="query" value="{{ request.GET.query }}" placeholder="Buscar usuario..." aria-label="Search" required>
         <button class="btn btn-outline-primary" type="submit">Buscar</button>
     </form>
@@ -46,9 +69,9 @@
                     {% else %}
                         <img src="{% static 'default.jpg' %}" alt="Foto de perfil">
                     {% endif %}
-                        <a href="{% url 'profile' usuario.id %}">
-                            {{ usuario.nombres }} {{ usuario.apellidos }} - {{ usuario.email_institucional }}
-                        </a>
+                    <a href="{% url 'profile' usuario.id %}">
+                        {{ usuario.nombres }} {{ usuario.apellidos }} - {{ usuario.email_institucional }}
+                    </a>
                 </li>
             {% endfor %}
         </ul>

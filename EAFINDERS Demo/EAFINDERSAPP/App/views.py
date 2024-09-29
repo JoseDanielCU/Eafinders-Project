@@ -1,4 +1,4 @@
-from .models import Usuario, Amistad
+from .models import Usuario, Amistad, Mensaje
 from django.contrib.auth import login as auth_login, authenticate, logout
 from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm, BuscarUsuarioForm
 from django.contrib.auth.hashers import make_password
@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from django.http import JsonResponse
 
 def logout_user(request):
     """View to log out the user."""
@@ -190,3 +191,57 @@ def Notificaciones(request):
         'solicitudes': solicitudes
     }
     return render(request, 'Notificaciones.html', contexto)
+@login_required
+def chat_view(request, amigo_id):
+    amigo = get_object_or_404(Usuario, id=amigo_id)
+
+    # Verificar que son amigos
+    amistad = Amistad.objects.filter(
+        (Q(user1=request.user) & Q(user2=amigo)) | (Q(user1=amigo) & Q(user2=request.user)),
+        estado='aceptada'
+    ).exists()
+
+    if not amistad:
+        return redirect('home')  # Redirigir si no son amigos
+
+    # Obtener los mensajes entre el usuario actual y el amigo
+    mensajes = Mensaje.objects.filter(
+        Q(remitente=request.user, destinatario=amigo) | Q(remitente=amigo, destinatario=request.user)
+    ).order_by('fecha_enviado')
+
+    if request.method == 'POST':
+        contenido = request.POST.get('contenido')
+        if contenido:
+            Mensaje.objects.create(remitente=request.user, destinatario=amigo, contenido=contenido)
+            return redirect('chat_view', amigo_id=amigo.id)  # Redirigir para actualizar la conversación
+
+    return render(request, 'chat.html', {'amigo': amigo, 'mensajes': mensajes})
+
+
+@login_required
+def obtener_mensajes(request, amigo_id):
+    amigo = get_object_or_404(Usuario, id=amigo_id)
+
+    # Obtener mensajes entre el usuario actual y el amigo
+    mensajes = Mensaje.objects.filter(
+        Q(remitente=request.user, destinatario=amigo) | Q(remitente=amigo, destinatario=request.user)
+    ).order_by('fecha_enviado')
+
+    # Formatear los mensajes para JSON
+    mensajes_json = []
+    for mensaje in mensajes:
+        mensajes_json.append({
+            'remitente': mensaje.remitente.nombres,  # Asegúrate de que este campo exista en tu modelo
+            'contenido': mensaje.contenido,
+        })
+
+    return JsonResponse(mensajes_json, safe=False)
+@login_required
+def lista_conversaciones(request):
+    # Obtener amigos con los que tienes amistad aceptada
+    amigos = Amistad.objects.filter(
+        (Q(user1=request.user) | Q(user2=request.user)),
+        estado='aceptada'
+    )
+    return render(request, 'lista_Chats.html', {'amigos': amigos})
+

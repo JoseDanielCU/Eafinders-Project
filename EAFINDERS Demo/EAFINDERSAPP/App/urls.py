@@ -18,6 +18,9 @@ urlpatterns = [
     path('aceptar_solicitud_amistad/<int:solicitud_id>/', views.aceptar_solicitud_amistad,name='aceptar_solicitud_amistad'),
     path('rechazar_solicitud_amistad/<int:solicitud_id>/', views.rechazar_solicitud_amistad, name='rechazar_solicitud_amistad'),
     path('eliminar_amistad/<int:user_id>/', views.eliminar_amistad, name='eliminar_amistad'),
+    path('conversaciones/', views.lista_conversaciones, name='lista_conversaciones'),
+    path('chat/<int:amigo_id>/', views.chat_view, name='chat_view'),
+    path('chat/<int:amigo_id>/obtener-mensajes/', views.obtener_mensajes, name='obtener_mensajes'),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

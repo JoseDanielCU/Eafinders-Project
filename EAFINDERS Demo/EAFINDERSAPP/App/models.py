@@ -78,4 +78,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.nombres} {self.apellidos} ({self.email_institucional})'
 
+class Mensaje(models.Model):
+    remitente = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='mensajes_enviados', on_delete=models.CASCADE)
+    destinatario = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='mensajes_recibidos', on_delete=models.CASCADE)
+    contenido = models.TextField()
+    fecha_enviado = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f'Mensaje de {self.remitente} a {self.destinatario}'

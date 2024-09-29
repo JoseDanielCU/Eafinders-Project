@@ -2,28 +2,53 @@
 {% load static %}
 
 {% block title %} Home {% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Estilos del modo oscuro para la página de inicio */
+    .dark-mode .card {
+        background-color: #1c1c1c; /* Fondo oscuro para las tarjetas */
+        color: #ffffff; /* Texto blanco */
+    }
+    .card {
+        transition: transform 0.2s; /* Transición suave al hacer hover */
+    }
+    .card:hover {
+        transform: scale(1.05); /* Efecto de hover */
+    }
+    .btn-primary {
+        background-color: #007bff; /* Color del botón */
+        border-color: #007bff; /* Borde del botón */
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <h1 class="display-4 text-center">Home</h1>
     <p class="lead text-center">Bienvenido a EAFINDERS</p>
 
     <h2 class="mt-5">Usuarios Registrados:</h2>
-    <ul class="list-unstyled">
+    <div class="row">
         {% for user in users %}
-            <li class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    {% if user.foto_perfil %}
-                        <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                    {% else %}
-                        <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                    {% endif %}
-                    <span class="h5">{{ user.nombres }} {{ user.apellidos }}</span>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body d-flex flex-column align-items-center">
+                        {% if user.foto_perfil %}
+                            <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% endif %}
+                        <h5 class="card-title">{{ user.nombres }} {{ user.apellidos }}</h5>
+                        <a href="{% url 'profile' user.id %}" class="btn btn-primary">Ver Perfil</a>
+                    </div>
                 </div>
-                <a href="{% url 'profile' user.id %}">
-                    <button class="btn btn-primary">Ver Perfil</button>
-                </a>
-            </li>
+            </div>
         {% empty %}
-            <li class="h5">No hay otros usuarios registrados.</li>
+            <div class="col-12">
+                <div class="alert alert-warning text-center" role="alert">
+                    No hay otros usuarios registrados.
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}
