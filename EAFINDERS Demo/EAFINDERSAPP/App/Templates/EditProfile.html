@@ -1,12 +1,51 @@
 {% extends 'Template.html' %}
 {% block title %} Edición Perfil {% endblock %}
+{% load static %}
+
+{% block extra_styles %}
+<style>
+    .profile-pics {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .profile-pics img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
 {% block content %}
   <h2>Editar Perfil</h2>
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+    <div class="profile-pics mb-3">
+        <div>
+            <h5>Foto Actual</h5>
+            {% if user.foto_perfil %}
+                <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil actual">
+            {% else %}
+                <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil actual">
+            {% endif %}
+        </div>
+        <div>
+            <h5>Nueva Foto</h5>
+            <img id="new-profile-pic" src="{% static 'default_profile.jpg' %}" alt="Nueva foto de perfil">
+        </div>
+    </div>
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a href="{% url 'profile' user.id %}" class="btn btn-secondary ms-2">Cancelar</a>
   </form>
 
-  <a href="{% url 'profile' user_id=request.user.id %}">Cancelar</a>
+  <script>
+    document.querySelector('input[type="file"]').addEventListener('change', function(event) {
+        const [file] = event.target.files;
+        if (file) {
+            document.getElementById('new-profile-pic').src = URL.createObjectURL(file);
+        }
+    });
+  </script>
 {% endblock %}

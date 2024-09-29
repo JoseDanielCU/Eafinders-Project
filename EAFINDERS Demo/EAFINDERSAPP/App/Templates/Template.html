@@ -11,7 +11,6 @@
 </head>
 <body>
     {% load static %}
-
     <!-- Barra de Navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
@@ -27,7 +26,6 @@
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
                 </ul>
-
                 <!-- Barra de Búsqueda -->
                 <form class="d-flex search-bar" method="GET" action="{% url 'buscar_usuarios' %}">
                     <input class="form-control me-2" type="search" name="query" placeholder="Buscar usuario..." aria-label="Search" required>
@@ -54,7 +52,6 @@
                         </li>
                         <li class="nav-item">
                             <button class="btn btn-danger" id="logout-btn">Cerrar sesión</button>
-
                             <!-- Formulario oculto que se enviará con JS -->
                             <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
                                 {% csrf_token %}
