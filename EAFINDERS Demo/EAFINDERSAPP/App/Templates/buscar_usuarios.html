@@ -1,0 +1,60 @@
+{% extends 'Template.html' %}
+{% load static %}
+
+{% block title %}Búsqueda de Usuarios{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .user-list-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+    }
+    .user-list-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+    .user-list-item a {
+        text-decoration: none;
+        color: #000;
+    }
+    .user-list-item a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Barra de búsqueda -->
+    <form class="d-flex mb-4" method="GET" action="{% url 'buscar_usuarios' %}">
+        <input class="form-control me-2" type="search" name="query" value="{{ request.GET.query }}" placeholder="Buscar usuario..." aria-label="Search" required>
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+    </form>
+
+    <!-- Resultados de la búsqueda -->
+    {% if usuarios %}
+        <h5>Resultados de la búsqueda:</h5>
+        <ul class="list-group">
+            {% for usuario in usuarios %}
+                <li class="list-group-item user-list-item">
+                    <!-- Foto de perfil y enlace al perfil del usuario -->
+                    {% if usuario.foto_perfil %}
+                        <img src="{{ usuario.foto_perfil.url }}" alt="Foto de perfil">
+                    {% else %}
+                        <img src="{% static 'default.jpg' %}" alt="Foto de perfil">
+                    {% endif %}
+                        <a href="{% url 'profile' usuario.id %}">
+                            {{ usuario.nombres }} {{ usuario.apellidos }} - {{ usuario.email_institucional }}
+                        </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif mensaje %}
+        <div class="alert alert-warning mt-4" role="alert">
+            {{ mensaje }}
+        </div>
+    {% endif %}
+{% endblock %}

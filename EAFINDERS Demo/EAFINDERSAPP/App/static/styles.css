@@ -1,0 +1,24 @@
+/* static/styles.css */
+.profile-pic {
+    width: 150px; /* Ajusta el tamaño según tus necesidades */
+    height: 150px; /* Ajusta el tamaño según tus necesidades */
+    object-fit: cover;
+}
+
+.profile-pic-navbar {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-header {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.profile-info {
+    margin-top: 20px;
+}

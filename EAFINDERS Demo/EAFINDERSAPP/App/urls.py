@@ -13,6 +13,7 @@ urlpatterns = [
     path('EditProfile/', views.EditProfile, name='EditProfile'),
     path('profile/<int:user_id>/', views.profile_view, name='profile'),
     path('Notificaciones/', views.Notificaciones, name='Notificaciones'),
+    path('buscar/', views.buscar_usuarios, name='buscar_usuarios'),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

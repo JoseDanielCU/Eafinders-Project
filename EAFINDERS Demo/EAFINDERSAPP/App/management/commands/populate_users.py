@@ -45,7 +45,7 @@ class Command(BaseCommand):
                 carrera=random.choice(self.CARRERAS),  # Choose a random career from the list
                 semestre=random.randint(1, 10)  # Random semester between 1 and 10
             )
-            usuario.set_password(password)  # Hash the password
+            usuario.set_password(password)
             usuario.save()
 
         self.stdout.write(self.style.SUCCESS('Successfully populated the database with 50 users.'))

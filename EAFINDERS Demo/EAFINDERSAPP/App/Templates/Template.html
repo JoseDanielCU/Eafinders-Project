@@ -5,25 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %} Template {% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    {% load static %}
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
+    {% load static %}
 
     <!-- Barra de Navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">EAFINDERS</a>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'logo.png' %}" alt="Logo"> EAFINDERS
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
+                </ul>
+
+                <!-- Barra de Búsqueda -->
+                <form class="d-flex search-bar" method="GET" action="{% url 'buscar_usuarios' %}">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Buscar usuario..." aria-label="Search" required>
+                    <button class="btn btn-outline-light" type="submit">Buscar</button>
+                </form>
+
+                <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'Cuenta' %}">Mi cuenta</a>
+                            <a class="nav-link" href="{% url 'Cuenta' %}">
+                                {% if user.foto_perfil %}
+                                    <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" class="profile-pic-navbar">
+                                {% else %}
+                                    <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="profile-pic-navbar">
+                                {% endif %}
+                                {{ user.nombres }}
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'Notificaciones' %}">Notificaciones</a>
@@ -32,12 +53,12 @@
                             <a class="nav-link" href="#">Chats</a>
                         </li>
                         <li class="nav-item">
-                                <button class="btn btn-primary" id="logout-btn">Cerrar sesión</button>
+                            <button class="btn btn-danger" id="logout-btn">Cerrar sesión</button>
 
-                                <!-- Formulario oculto que se enviará con JS -->
-                                <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
-                                    {% csrf_token %}
-                                </form>
+                            <!-- Formulario oculto que se enviará con JS -->
+                            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+                                {% csrf_token %}
+                            </form>
                         </li>
                     {% else %}
                         <li class="nav-item">
@@ -57,6 +78,7 @@
         {% block content %}
         {% endblock %}
     </div>
+
 <script>
     document.getElementById('logout-btn').addEventListener('click', function() {
         document.getElementById('logout-form').submit();

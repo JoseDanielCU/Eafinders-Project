@@ -4,7 +4,11 @@ from django.core.exceptions import ValidationError
 from .models import Usuario
 
 
-
+class BuscarUsuarioForm(forms.Form):
+    query = forms.CharField(
+        label='Buscar usuario',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por nombre, apellido, carrera o email...'})
+    )
 class LoginForm(forms.Form):
     email_institucional = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}),
                                            label="Correo Institucional")

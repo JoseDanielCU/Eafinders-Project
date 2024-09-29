@@ -1,11 +1,11 @@
 from .models import Usuario
 from django.contrib.auth import login as auth_login, authenticate, logout
-from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm
+from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm, BuscarUsuarioForm
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db import models
+from django.db.models import Q
 
 def logout_user(request):
     """View to log out the user."""
@@ -16,8 +16,9 @@ def logout_user(request):
 @login_required
 def profile_view(request, user_id):
     """View to display a user's profile."""
-    user = get_object_or_404(Usuario, id=user_id)
-    return render(request, 'Profiles.html')
+    user = get_object_or_404(Usuario, id=user_id)  # Obtén el usuario usando el ID pasado en la URL
+    return render(request, 'Profiles.html', {'user': user})  # Pasa el usuario a la plantilla
+
 @login_required
 def Notificaciones(request):
     """View to show notifications for friendship requests."""
@@ -84,3 +85,28 @@ def registro_usuario(request):
         form = RegistroUsuarioForm()
 
     return render(request, 'Register.html', {'form': form})
+
+
+def buscar_usuarios(request):
+    query = request.GET.get('query', None)
+    usuarios = None
+    mensaje = None
+
+    if query:
+        # Realizamos la búsqueda en los campos de nombre, apellido, o email
+        usuarios = Usuario.objects.filter(
+            Q(nombres__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(email_institucional__icontains=query)
+        )
+
+        # Si no hay resultados
+        if not usuarios.exists():
+            mensaje = "No se encontraron coincidencias."
+
+    context = {
+        'usuarios': usuarios,
+        'mensaje': mensaje
+    }
+
+    return render(request, 'buscar_usuarios.html', context)
