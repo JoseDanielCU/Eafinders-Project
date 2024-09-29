@@ -67,7 +67,7 @@
                     {% if usuario.foto_perfil %}
                         <img src="{{ usuario.foto_perfil.url }}" alt="Foto de perfil">
                     {% else %}
-                        <img src="{% static 'default.jpg' %}" alt="Foto de perfil">
+                        <img src="{% static 'Default_profile.jpg' %}" alt="Foto de perfil">
                     {% endif %}
                     <a href="{% url 'profile' usuario.id %}">
                         {{ usuario.nombres }} {{ usuario.apellidos }} - {{ usuario.email_institucional }}

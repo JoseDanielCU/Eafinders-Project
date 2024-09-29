@@ -160,14 +160,17 @@ def aceptar_solicitud_amistad(request, solicitud_id):
     solicitud.aceptar_solicitud()
     return redirect('Notificaciones')
 
+
 @login_required
 def rechazar_solicitud_amistad(request, solicitud_id):
+    # Obtener la solicitud de amistad
     amistad = get_object_or_404(Amistad, id=solicitud_id, user2=request.user, estado='pendiente')
-    amistad.estado = 'rechazada'
-    amistad.save()
 
-    return redirect('notificaciones')
+    # Eliminar la solicitud de amistad
+    amistad.delete()
 
+    messages.success(request, 'Solicitud de amistad rechazada. Ahora puedes enviar una nueva solicitud si lo deseas.')
+    return redirect('Notificaciones')
 @login_required
 def eliminar_amistad(request, user_id):
     amigo = get_object_or_404(Usuario, id=user_id)
