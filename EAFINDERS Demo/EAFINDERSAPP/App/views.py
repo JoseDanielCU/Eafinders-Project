@@ -264,15 +264,22 @@ def crear_foro(request):
 
     return render(request, 'crear_foro.html', {'form': form})
 def detalle_foro(request, foro_id):
-    foro = Foro.objects.get(id=foro_id)
-    comentarios = foro.comentarios.all()
+    foro = get_object_or_404(Foro, id=foro_id)
+    comentarios = foro.comentarios.filter(parent=None)  # Solo comentarios principales (sin respuestas)
 
     if request.method == 'POST':
-        form = ComentarioForm(request.POST, request.FILES)  # Asegúrate de incluir request.FILES
+        form = ComentarioForm(request.POST, request.FILES)  # Incluye request.FILES
         if form.is_valid():
             comentario = form.save(commit=False)
             comentario.foro = foro
             comentario.autor = request.user
+
+            # Verifica si hay un parent_id en el POST (lo que indicaría una respuesta)
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                parent_comentario = get_object_or_404(Comentario, id=parent_id)
+                comentario.parent = parent_comentario  # Asocia la respuesta al comentario principal
+
             comentario.save()
             return redirect('detalle_foro', foro_id=foro.id)
     else:
