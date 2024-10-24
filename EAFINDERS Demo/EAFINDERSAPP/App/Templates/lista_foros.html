@@ -9,7 +9,7 @@
     <ul class="list-group">
         {% for foro in foros %}
             <li class="list-group-item">
-                <a href="{% url 'foro_detalle' foro.id %}">{{ foro.titulo }}</a>
+                <a href="{% url 'detalle_foro' foro.id %}">{{ foro.titulo }}</a>
                 <small class="text-muted">Por {{ foro.autor.username }} el {{ foro.fecha_creacion }}</small>
             </li>
         {% endfor %}
