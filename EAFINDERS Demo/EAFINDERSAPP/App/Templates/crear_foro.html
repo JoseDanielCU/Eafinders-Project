@@ -3,19 +3,37 @@
 {% block title %}Crear Foro{% endblock %}
 
 {% block content %}
-<div class="container mt-5 dark-mode-adaptable">
-    <h2 class="dark-text">Crear un nuevo foro</h2>
-    <form method="post" class="dark-card p-4 rounded shadow">
+<div class="container mt-5">
+    <h2 class="mb-4">Crear un nuevo foro</h2>
+    <form method="post" enctype="multipart/form-data" class="border p-4 rounded bg-light shadow-sm dark-card">
         {% csrf_token %}
+        {{ form.non_field_errors }}
 
-        <!-- Renderizar el formulario con clases de modo oscuro -->
-        <div class="form-group">
-            {{ form.non_field_errors }}
+        <div class="mb-3">
+            <label for="id_titulo" class="form-label dark-text">Título</label>
+            <input type="text" name="titulo" id="id_titulo" class="form-control dark-card-body" value="{{ form.titulo.value|default_if_none:'' }}">
+            <div class="text-danger">{{ form.titulo.errors }}</div>
         </div>
 
-        {{ form.as_p }}
+        <div class="mb-3">
+            <label for="id_descripcion" class="form-label dark-text">Descripción</label>
+            <textarea name="descripcion" id="id_descripcion" class="form-control dark-card-body">{{ form.descripcion.value|default_if_none:'' }}</textarea>
+            <div class="text-danger">{{ form.descripcion.errors }}</div>
+        </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Crear Foro</button>
+        <div class="mb-3">
+            <label for="id_foto_foro" class="form-label dark-text">Foto del foro (opcional)</label>
+            <input type="file" name="foto_foro" id="id_foto_foro" class="form-control">
+            <div class="text-danger">{{ form.foto_foro.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_etiquetas" class="form-label dark-text">Etiquetas (separadas por comas)</label>
+            <input type="text" name="etiquetas" id="id_etiquetas" class="form-control dark-card-body" value="{{ form.etiquetas.value|default_if_none:'' }}">
+            <div class="text-danger">{{ form.etiquetas.errors }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear Foro</button>
     </form>
 </div>
 {% endblock %}

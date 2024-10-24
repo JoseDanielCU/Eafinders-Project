@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Usuario, Foro, Comentario
+from .models import Usuario, Foro, Comentario, Etiqueta
 
 class BuscarUsuarioForm(forms.Form):
     query = forms.CharField(
@@ -129,14 +129,32 @@ class EditarPerfilForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class': 'form-control'})  # Estilos para cada campo
 
 class ForoForm(forms.ModelForm):
+    etiquetas = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Añade etiquetas separadas por comas'})
+    )
+
     class Meta:
         model = Foro
-        fields = ['titulo', 'descripcion', 'foto_foro']  # Añadimos foto_foro al formulario
-        widgets = {
-            'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título del foro'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del foro'}),
-            'foto_foro': forms.ClearableFileInput(attrs={'class': 'form-control'}),  # Estilo para el input de la imagen
-        }
+        fields = ['titulo', 'descripcion', 'foto_foro', 'etiquetas']
+
+    def save(self, commit=True):
+        # Primero, guardamos el foro sin etiquetas
+        foro = super().save(commit=False)
+        foro.creador = self.initial.get('creador')  # Asegúrate de asignar el creador si es necesario
+        if commit:
+            foro.save()  # Guardamos el foro para obtener el ID
+
+            # Ahora que el foro tiene un ID, podemos agregar etiquetas
+            etiquetas_nuevas = self.cleaned_data['etiquetas']
+            if etiquetas_nuevas:
+                etiquetas_nuevas = [etiqueta.strip() for etiqueta in etiquetas_nuevas.split(',')]
+                for nombre_etiqueta in etiquetas_nuevas:
+                    # Busca la etiqueta o crea una nueva
+                    etiqueta, creada = Etiqueta.objects.get_or_create(nombre=nombre_etiqueta)
+                    foro.etiquetas.add(etiqueta)  # Ahora podemos agregar las etiquetas
+
+        return foro
 class ComentarioForm(forms.ModelForm):
     class Meta:
         model = Comentario

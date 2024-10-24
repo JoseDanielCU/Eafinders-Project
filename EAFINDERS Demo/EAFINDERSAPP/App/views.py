@@ -1,4 +1,4 @@
-from .models import Usuario, Amistad, Mensaje, Foro, Comentario
+from .models import Usuario, Amistad, Mensaje, Foro, Comentario, Etiqueta
 from django.contrib.auth import login as auth_login, authenticate, logout
 from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm, BuscarUsuarioForm, ForoForm, ComentarioForm
 from django.contrib.auth.hashers import make_password
@@ -253,12 +253,12 @@ def lista_conversaciones(request):
 @login_required
 def crear_foro(request):
     if request.method == 'POST':
-        form = ForoForm(request.POST)
+        form = ForoForm(request.POST, request.FILES)
         if form.is_valid():
             foro = form.save(commit=False)
-            foro.creador = request.user  # Asigna el usuario autenticado como creador
-            foro.save()
-            return redirect('detalle_foro', foro_id=foro.id)  # Redirige a la página del foro creado
+            form.initial['creador'] = request.user
+            form.save()
+            return redirect('lista_foros')
     else:
         form = ForoForm()
 
@@ -287,9 +287,30 @@ def detalle_foro(request, foro_id):
 
     return render(request, 'detalle_foro.html', {'foro': foro, 'comentarios': comentarios, 'form': form})
 
+
 def lista_foros(request):
-    foros = Foro.objects.all().order_by('-fecha_creacion')
-    return render(request, 'lista_foros.html', {'foros': foros})
+    query = request.GET.get('q')  # Obtener la consulta de búsqueda
+    etiquetas_ids = request.GET.getlist('etiquetas')  # Obtener múltiples etiquetas seleccionadas
+    foros = Foro.objects.all()  # Obtener todos los foros inicialmente
+
+    # Filtrar foros según la consulta de búsqueda
+    if query:
+        foros = foros.filter(
+            Q(titulo__icontains=query) |
+            Q(creador__nombres__icontains=query) |
+            Q(creador__apellidos__icontains=query) |
+            Q(fecha_creacion__icontains=query)
+        )
+
+    # Filtrar foros según las etiquetas seleccionadas
+    if etiquetas_ids:
+        foros = foros.filter(etiquetas__id__in=etiquetas_ids).distinct()
+
+    # Obtener todas las etiquetas para el filtro
+    etiquetas = Etiqueta.objects.all()
+
+    # Renderizar la plantilla con foros y etiquetas
+    return render(request, 'lista_foros.html', {'foros': foros, 'etiquetas': etiquetas})
 
 
 @login_required

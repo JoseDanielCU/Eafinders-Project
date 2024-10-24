@@ -84,13 +84,20 @@ class Mensaje(models.Model):
 
     def __str__(self):
         return f'Mensaje de {self.remitente} a {self.destinatario}'
+class Etiqueta(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)  # Nombre de la etiqueta
+
+    def __str__(self):
+        return self.nombre
+
 class Foro(models.Model):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    foto_foro = models.ImageField(upload_to='foros_media/', blank=True, null=True)  # Campo para la foto del foro
-    likes = models.ManyToManyField(Usuario, related_name='foros_likes', blank=True)  # Campo para los likes
+    foto_foro = models.ImageField(upload_to='foros_media/', blank=True, null=True)
+    likes = models.ManyToManyField(Usuario, related_name='foros_likes', blank=True)
+    etiquetas = models.ManyToManyField(Etiqueta, related_name='foros', blank=True)  # Nuevo campo de etiquetas
 
     def total_likes(self):
         return self.likes.count()

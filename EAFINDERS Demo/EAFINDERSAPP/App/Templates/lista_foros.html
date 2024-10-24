@@ -2,59 +2,119 @@
 {% load static %}
 
 {% block title %}Foros{% endblock %}
-{% block extra_styles %}
-<style>
-    /* Estilos específicos para el modo oscuro en lista_foros.html */
-    .dark-mode .dark-card {
-        background-color: #2c2c2c;
-        border-color: #444;
-    }
-
-    .dark-mode .dark-card-body {
-        color: #fff;
-    }
-
-    .dark-mode .dark-text {
-        color: #ddd;
-    }
-
-    .dark-mode .dark-muted {
-        color: #888;
-    }
-</style>
-{% endblock %}
 {% block content %}
-    <div class="container my-4">
-        <h1 class="mb-4">Foros</h1>
-        <a href="{% url 'crear_foro' %}" class="btn btn-primary mb-3">Crear nuevo foro</a>
+<div class="container my-4">
+    <h1 class="mb-4">Foros</h1>
 
-        <div class="row">
+    <!-- Barra de búsqueda -->
+    <form method="GET" action="" class="mb-3" id="search-form">
+        <div class="input-group">
+            <input type="text" id="search-input" name="q" class="form-control" placeholder="Buscar por título, autor o fecha" value="{{ request.GET.q }}">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        </div>
+
+        <!-- Filtros seleccionados -->
+        <div id="selected-filters" class="mt-2 d-flex flex-wrap">
+            {% for tag_id in request.GET.etiquetas|default:''|split:',' %}
+                {% for etiqueta in etiquetas %}
+                    {% if etiqueta.id|stringformat:"s" == tag_id %}
+                        <span class="badge bg-primary me-2" data-id="{{ etiqueta.id }}">
+                            {{ etiqueta.nombre }} <button type="button" class="btn-close btn-close-white btn-remove-filter" aria-label="Close"></button>
+                        </span>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <!-- Barra de búsqueda para etiquetas -->
+        <div class="mt-3">
+            <input type="text" id="filter-input" class="form-control" placeholder="Buscar etiquetas...">
+            <div id="filter-results" class="list-group mt-2" style="display: none;"></div>
+        </div>
+    </form>
+
+    <a href="{% url 'crear_foro' %}" class="btn btn-primary mb-3">Crear nuevo foro</a>
+
+    <div class="row">
+        {% if foros %}
             {% for foro in foros %}
                 <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm dark-card"> <!-- Clase extra para soportar modo oscuro -->
+                    <div class="card shadow-sm dark-card">
                         <div class="card-body dark-card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="ml-3">
-                                    <h5 class="card-title mb-0">
-                                        <a href="{% url 'detalle_foro' foro.id %}" class="text-dark dark-text">{{ foro.titulo }}</a>
-                                    </h5>
-                                    <small class="text-muted dark-muted">Por {{ foro.creador.nombres }} {{ foro.creador.apellidos }}</small>
-                                </div>
-                            </div>
+                            <h5 class="card-title mb-0">
+                                <a href="{% url 'detalle_foro' foro.id %}" class="text-dark dark-text">{{ foro.titulo }}</a>
+                            </h5>
+                            <small class="text-muted dark-muted">Por {{ foro.creador.nombres }} {{ foro.creador.apellidos }}</small>
                             <p class="card-text dark-text">{{ foro.descripcion|truncatewords:20 }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <form method="post" action="{% url 'like_foro' foro.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        {{ foro.total_likes }} Me gusta
-                                    </button>
-                                </form>
-                                <small class="text-muted dark-muted">Creado el {{ foro.fecha_creacion|date:"d M Y" }}</small>
-                            </div>
+                            <small class="text-muted dark-muted">Etiquetas:
+                                {% for etiqueta in foro.etiquetas.all %}
+                                    <span class="badge bg-secondary">{{ etiqueta.nombre }}</span>
+                                {% endfor %}
+                            </small>
                         </div>
                     </div>
                 </div>
             {% endfor %}
-        </div>
+        {% else %}
+            <p>No se encontraron foros.</p>
+        {% endif %}
     </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterInput = document.getElementById('filter-input');
+        const selectedFilters = document.getElementById('selected-filters');
+        const filterResults = document.getElementById('filter-results');
+
+        const etiquetas = [
+            {% for etiqueta in etiquetas %}
+                { id: '{{ etiqueta.id }}', nombre: '{{ etiqueta.nombre }}' },
+            {% endfor %}
+        ];
+
+        // Filtrar etiquetas al escribir en la barra de búsqueda
+        filterInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            filterResults.innerHTML = '';
+            const filteredEtiquetas = etiquetas.filter(etiqueta => etiqueta.nombre.toLowerCase().includes(query));
+
+            filteredEtiquetas.forEach(etiqueta => {
+                const item = document.createElement('a');
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = etiqueta.nombre;
+                item.onclick = function() {
+                    addFilter(etiqueta);
+                };
+                filterResults.appendChild(item);
+            });
+
+            filterResults.style.display = filteredEtiquetas.length ? 'block' : 'none';
+        });
+
+        // Añadir filtro
+        function addFilter(etiqueta) {
+            const existingBadge = selectedFilters.querySelector(`span[data-id='${etiqueta.id}']`);
+            if (!existingBadge) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary me-2';
+                badge.setAttribute('data-id', etiqueta.id);
+                badge.textContent = etiqueta.nombre;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn-close btn-close-white btn-remove-filter';
+                removeBtn.setAttribute('aria-label', 'Close');
+                removeBtn.onclick = function() {
+                    badge.remove();
+                };
+
+                badge.appendChild(removeBtn);
+                selectedFilters.appendChild(badge);
+                filterInput.value = '';  // Limpiar la barra de búsqueda
+                filterResults.style.display = 'none';  // Ocultar los resultados
+            }
+        }
+    });
+</script>
 {% endblock %}
