@@ -89,15 +89,22 @@ class Foro(models.Model):
     descripcion = models.TextField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    foto_foro = models.ImageField(upload_to='foros_media/', blank=True, null=True)  # Campo para la foto del foro
+    likes = models.ManyToManyField(Usuario, related_name='foros_likes', blank=True)  # Campo para los likes
+
+    def total_likes(self):
+        return self.likes.count()
 
     def __str__(self):
         return self.titulo
+
 class Comentario(models.Model):
     foro = models.ForeignKey(Foro, on_delete=models.CASCADE, related_name='comentarios')
     autor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     contenido = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='respuestas')
+    archivo = models.FileField(upload_to='comentarios_archivos/', blank=True, null=True)  # Campo para archivos adjuntos
 
     def __str__(self):
         return f'Comentario de {self.autor} en {self.foro}'

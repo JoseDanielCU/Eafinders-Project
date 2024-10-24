@@ -11,6 +11,53 @@
     {% block extra_styles %}{% endblock %}
     <style>
         /* Estilos generales del modo oscuro */
+            /* Estilos generales del modo oscuro */
+    body.dark-mode {
+        background-color: #121212;
+        color: #ffffff !important; /* El texto general debe ser blanco en modo oscuro */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .navbar.dark-mode {
+        background-color: #1c1c1c;
+    }
+
+    .container.dark-mode {
+        background-color: #1c1c1c;
+        color: #ffffff !important; /* Asegúrate de que el texto sea blanco */
+    }
+
+    /* Estilos específicos para las tarjetas y textos en el modo oscuro */
+    .dark-mode .dark-card {
+        background-color: #2c2c2c !important;
+        border-color: #444 !important;
+    }
+
+    .dark-mode .dark-card-body {
+        color: #ffffff !important; /* Forzar el texto a ser blanco */
+    }
+
+    .dark-mode .dark-text {
+        color: #ffffff !important; /* Asegúrate de que el texto sea blanco */
+    }
+
+    .dark-mode .dark-muted {
+        color: #888 !important; /* Texto muted más claro para modo oscuro */
+    }
+
+    .dark-mode a.text-dark {
+        color: #ffffff !important; /* Enlace de texto oscuro en modo oscuro */
+    }
+
+    .dark-mode .btn-outline-primary {
+        color: #ffffff !important; /* Botón debe tener texto blanco en modo oscuro */
+        border-color: #ffffff !important; /* Borde del botón debe ser blanco */
+    }
+
+    .dark-mode .btn-outline-primary:hover {
+        background-color: #ffffff !important; /* Cambia el fondo al hacer hover en modo oscuro */
+        color: #000000 !important; /* Texto del botón en hover debe ser negro */
+    }
         body.dark-mode {
             background-color: #121212;
             color: #ffffff;

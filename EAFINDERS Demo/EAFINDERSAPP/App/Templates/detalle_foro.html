@@ -2,72 +2,130 @@
 
 {% block title %}{{ foro.titulo }}{% endblock %}
 
+{% block extra_styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 dark-mode-adaptable">
     <h1>{{ foro.titulo }}</h1>
-    <p>{{ foro.descripcion }}</p>
-    <small class="text-muted">Por {{ foro.autor.nombres }} {{ foro.autor.apellidos }} el {{ foro.fecha_creacion }}</small>
+    <p class="dark-text">{{ foro.descripcion }}</p>
+    <small class="text-muted dark-muted">Creado por {{ foro.creador.nombres }} {{ foro.creador.apellidos }} el {{ foro.fecha_creacion }}</small>
 
     <h3 class="mt-4">Comentarios</h3>
     <ul class="list-group">
         {% for comentario in comentarios %}
-            <li class="list-group-item {% if comentario.autor == request.user %}bg-light{% endif %}">
+            <li class="list-group-item {% if comentario.autor == request.user %}bg-light{% endif %} dark-card">
                 <div>
-                    <strong>{{ comentario.autor.nombres }} {{ comentario.autor.apellidos }}</strong>
-                    <p>{{ comentario.contenido }}</p>
-                    <small class="text-muted">{{ comentario.fecha_creacion }}</small>
+                    <strong class="dark-text">{{ comentario.autor.nombres }} {{ comentario.autor.apellidos }}</strong>
+                    <p class="dark-text">{{ comentario.contenido }}</p>
+
+                    <!-- Contenedor para la fecha en la esquina inferior derecha -->
+                    <small class="text-muted dark-muted" style="position: absolute; right: 10px; bottom: 10px;">{{ comentario.fecha_creacion }}</small>
+
+                    <!-- Mostrar archivo adjunto, si existe -->
+                    {% if comentario.archivo %}
+                        <div class="mt-2">
+                            <a href="{{ comentario.archivo.url }}" class="btn btn-link dark-text" download>
+                                Descargar archivo
+                            </a>
+                            <div class="mt-1">
+                                <img src="{{ comentario.archivo.url }}" class="img-fluid rounded shadow" alt="Archivo adjunto" style="max-height: 150px; object-fit: cover;">
+                            </div>
+                        </div>
+                    {% endif %}
 
                     <!-- Botón para mostrar/ocultar respuestas -->
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#respuestas-{{ comentario.id }}">
-                        Respuestas ({{ comentario.respuestas.count }})
+                    <button class="btn btn-link dark-text" type="button" data-bs-toggle="collapse" data-bs-target="#respuestas-{{ comentario.id }}" aria-expanded="false" aria-controls="respuestas-{{ comentario.id }}">
+                        Ver Respuestas ({{ comentario.respuestas.count }})
                     </button>
+
+                    <!-- Contenedor de respuestas colapsable -->
                     <div class="collapse" id="respuestas-{{ comentario.id }}">
                         <ul class="list-group mt-2">
                             {% for respuesta in comentario.respuestas.all %}
-                                <li class="list-group-item {% if respuesta.autor == request.user %}bg-light{% endif %}">
-                                    <strong>{{ respuesta.autor.nombres }} {{ respuesta.autor.apellidos }}</strong> - {{ respuesta.contenido }}
-                                    <small class="text-muted">{{ respuesta.fecha_creacion }}</small>
+                                <li class="list-group-item {% if respuesta.autor == request.user %}bg-light{% endif %} dark-card">
+                                    <strong class="dark-text">{{ respuesta.autor.nombres }} {{ respuesta.autor.apellidos }}</strong> - {{ respuesta.contenido }}
+                                    <small class="text-muted dark-muted">{{ respuesta.fecha_creacion }}</small>
                                 </li>
                             {% empty %}
-                                <li class="list-group-item">No hay respuestas aún.</li>
+                                <li class="list-group-item dark-card">No hay respuestas aún.</li>
                             {% endfor %}
                         </ul>
+                    </div>
 
-                        <!-- Formulario para agregar una respuesta -->
-                        <button class="btn btn-secondary" onclick="toggleRespuestaForm('form-respuesta-{{ comentario.id }}')">Responder</button>
-                        <div id="form-respuesta-{{ comentario.id }}" style="display:none;">
-                            <form method="POST" class="mt-2">
-                                {% csrf_token %}
-                                <input type="hidden" name="parent_id" value="{{ comentario.id }}">
-                                {{ form.as_p }}
-                                <button type="submit" class="btn btn-secondary">Enviar Respuesta</button>
-                            </form>
-                        </div>
+                    <!-- Botón para mostrar el formulario de respuesta -->
+                    <button class="btn btn-secondary mt-2" onclick="toggleRespuestaForm('form-respuesta-{{ comentario.id }}')">Responder</button>
+
+                    <!-- Formulario de respuesta oculto -->
+                    <div id="form-respuesta-{{ comentario.id }}" style="display:none;">
+                        <form method="POST" class="mt-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" value="{{ comentario.id }}">
+                            <textarea name="contenido" class="form-control dark-card-body dark-text" rows="2" placeholder="Añade una respuesta..."></textarea>
+                            <button type="submit" class="btn btn-secondary mt-1">Enviar Respuesta</button>
+                        </form>
                     </div>
                 </div>
             </li>
         {% empty %}
-            <li class="list-group-item">No hay comentarios aún.</li>
+            <li class="list-group-item dark-card">No hay comentarios aún.</li>
         {% endfor %}
     </ul>
 
-    <h4 class="mt-4">Añadir un comentario</h4>
-    <form method="POST">
+    <h4 class="mt-4 dark-text">Añadir un comentario</h4>
+    <form method="POST" enctype="multipart/form-data" class="border p-3 rounded bg-light shadow-sm dark-card">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        <div class="mb-3">
+            <label for="id_contenido" class="form-label dark-text">Comentario</label>
+            <textarea name="contenido" id="id_contenido" class="form-control dark-card-body dark-text" rows="3" placeholder="Añade un comentario..." required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_archivo" class="form-label dark-text">Adjuntar archivo (opcional)</label>
+            <div class="input-group">
+                <input type="file" name="archivo" id="id_archivo" class="form-control" accept="image/*" onchange="previewImage(event)">
+                <button type="button" class="btn btn-outline-secondary dark-text" onclick="document.getElementById('id_archivo').click();">
+                    <i class="bi bi-arrow-up"></i>
+                </button>
+            </div>
+            <div id="image-preview" class="mt-2" style="display:none;">
+                <img id="preview" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeImage()">Quitar</button>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-primary">Añadir comentario</button>
     </form>
 </div>
 
-<!-- Agrega tu JavaScript aquí -->
 <script>
     function toggleRespuestaForm(formId) {
         var form = document.getElementById(formId);
-        if (form.style.display === "none") {
-            form.style.display = "block";
-        } else {
-            form.style.display = "none";
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+
+    function previewImage(event) {
+        const imagePreview = document.getElementById('image-preview');
+        const previewImg = document.getElementById('preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                previewImg.src = reader.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
         }
+    }
+
+    function removeImage() {
+        const fileInput = document.getElementById('id_archivo');
+        fileInput.value = '';
+        document.getElementById('preview').src = '';
+        document.getElementById('image-preview').style.display = 'none';
     }
 </script>
 {% endblock %}

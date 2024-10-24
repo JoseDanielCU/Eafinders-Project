@@ -3,12 +3,19 @@
 {% block title %}Crear Foro{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Crear un nuevo foro</h2>
-    <form method="post">
+<div class="container mt-5 dark-mode-adaptable">
+    <h2 class="dark-text">Crear un nuevo foro</h2>
+    <form method="post" class="dark-card p-4 rounded shadow">
         {% csrf_token %}
+
+        <!-- Renderizar el formulario con clases de modo oscuro -->
+        <div class="form-group">
+            {{ form.non_field_errors }}
+        </div>
+
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Crear Foro</button>
+
+        <button type="submit" class="btn btn-primary mt-3">Crear Foro</button>
     </form>
 </div>
 {% endblock %}

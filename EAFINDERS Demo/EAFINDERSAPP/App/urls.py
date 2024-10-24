@@ -24,5 +24,5 @@ urlpatterns = [
     path('crear_foro/', views.crear_foro, name='crear_foro'),
     path('foro/<int:foro_id>/', views.detalle_foro, name='detalle_foro'),
     path('foros/', views.lista_foros, name='lista_foros'),
-
+    path('foros/<int:foro_id>/like/', views.like_foro, name='like_foro'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

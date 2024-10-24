@@ -263,27 +263,37 @@ def crear_foro(request):
         form = ForoForm()
 
     return render(request, 'crear_foro.html', {'form': form})
-@login_required
 def detalle_foro(request, foro_id):
-    foro = get_object_or_404(Foro, id=foro_id)
-    comentarios = foro.comentarios.filter(parent=None)  # Solo comentarios de nivel superior
+    foro = Foro.objects.get(id=foro_id)
+    comentarios = foro.comentarios.all()
+
     if request.method == 'POST':
-        form = ComentarioForm(request.POST)
+        form = ComentarioForm(request.POST, request.FILES)  # Asegúrate de incluir request.FILES
         if form.is_valid():
-            contenido = form.cleaned_data['contenido']
-            parent_id = request.POST.get('parent_id')  # Obtenemos el parent_id
-            comentario = Comentario(
-                foro=foro,
-                autor=request.user,
-                contenido=contenido,
-                parent=Comentario.objects.get(id=parent_id) if parent_id else None  # Usamos el objeto Comentario o None
-            )
+            comentario = form.save(commit=False)
+            comentario.foro = foro
+            comentario.autor = request.user
             comentario.save()
             return redirect('detalle_foro', foro_id=foro.id)
     else:
         form = ComentarioForm()
+
     return render(request, 'detalle_foro.html', {'foro': foro, 'comentarios': comentarios, 'form': form})
 
 def lista_foros(request):
     foros = Foro.objects.all().order_by('-fecha_creacion')
     return render(request, 'lista_foros.html', {'foros': foros})
+
+
+@login_required
+def like_foro(request, foro_id):
+    foro = get_object_or_404(Foro, id=foro_id)
+    usuario = request.user
+
+    if usuario in foro.likes.all():
+        foro.likes.remove(usuario)  # Quitar el like si ya lo ha dado
+    else:
+        foro.likes.add(usuario)  # Añadir el like
+
+    return redirect('lista_foros')
+

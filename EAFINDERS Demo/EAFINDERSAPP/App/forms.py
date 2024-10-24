@@ -131,15 +131,16 @@ class EditarPerfilForm(forms.ModelForm):
 class ForoForm(forms.ModelForm):
     class Meta:
         model = Foro
-        fields = ['titulo', 'descripcion']
+        fields = ['titulo', 'descripcion', 'foto_foro']  # Añadimos foto_foro al formulario
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título del foro'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del foro'}),
+            'foto_foro': forms.ClearableFileInput(attrs={'class': 'form-control'}),  # Estilo para el input de la imagen
         }
 class ComentarioForm(forms.ModelForm):
     class Meta:
         model = Comentario
-        fields = ['contenido']
+        fields = ['contenido', 'archivo']  # Añadir el campo 'archivo'
         widgets = {
             'contenido': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Añade un comentario...'}),
         }
