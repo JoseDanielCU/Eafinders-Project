@@ -14,8 +14,8 @@
         </div>
 
         <!-- Filtros seleccionados -->
-        <div id="selected-filters" class="mt-2 d-flex flex-wrap">
-            {% for tag_id in request.GET.etiquetas|default:''|split:',' %}
+        <div id="selected-filters" class="mt-2">
+            {% for tag_id in etiquetas_lista %}
                 {% for etiqueta in etiquetas %}
                     {% if etiqueta.id|stringformat:"s" == tag_id %}
                         <span class="badge bg-primary me-2" data-id="{{ etiqueta.id }}">
@@ -26,10 +26,14 @@
             {% endfor %}
         </div>
 
-        <!-- Barra de búsqueda para etiquetas -->
+        <!-- Filtro de etiquetas múltiples -->
         <div class="mt-3">
-            <input type="text" id="filter-input" class="form-control" placeholder="Buscar etiquetas...">
-            <div id="filter-results" class="list-group mt-2" style="display: none;"></div>
+            <label for="etiquetas">Filtrar por etiquetas:</label>
+            <select id="filter-select" name="etiquetas" class="form-select" multiple>
+                {% for etiqueta in etiquetas %}
+                    <option value="{{ etiqueta.id }}">{{ etiqueta.nombre }}</option>
+                {% endfor %}
+            </select>
         </div>
     </form>
 
@@ -63,58 +67,48 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const filterInput = document.getElementById('filter-input');
+        const filterSelect = document.getElementById('filter-select');
         const selectedFilters = document.getElementById('selected-filters');
-        const filterResults = document.getElementById('filter-results');
+        const searchInput = document.getElementById('search-input');
 
-        const etiquetas = [
-            {% for etiqueta in etiquetas %}
-                { id: '{{ etiqueta.id }}', nombre: '{{ etiqueta.nombre }}' },
-            {% endfor %}
-        ];
+        // Manejar el cambio en el select de filtros
+        filterSelect.addEventListener('change', function() {
+            const selectedOptions = Array.from(this.selectedOptions);
+            selectedOptions.forEach(option => {
+                // Agregar el filtro como un badge
+                if (!document.querySelector(span[data-id='${option.value}'])) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-primary me-2';
+                    badge.setAttribute('data-id', option.value);
+                    badge.textContent = option.textContent;
 
-        // Filtrar etiquetas al escribir en la barra de búsqueda
-        filterInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            filterResults.innerHTML = '';
-            const filteredEtiquetas = etiquetas.filter(etiqueta => etiqueta.nombre.toLowerCase().includes(query));
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'btn-close btn-close-white btn-remove-filter';
+                    removeBtn.setAttribute('aria-label', 'Close');
+                    removeBtn.onclick = function() {
+                        badge.remove();
+                        // Eliminar la opción seleccionada
+                        option.selected = false;
+                    };
 
-            filteredEtiquetas.forEach(etiqueta => {
-                const item = document.createElement('a');
-                item.className = 'list-group-item list-group-item-action';
-                item.textContent = etiqueta.nombre;
-                item.onclick = function() {
-                    addFilter(etiqueta);
-                };
-                filterResults.appendChild(item);
+                    badge.appendChild(removeBtn);
+                    selectedFilters.appendChild(badge);
+                }
             });
-
-            filterResults.style.display = filteredEtiquetas.length ? 'block' : 'none';
         });
 
-        // Añadir filtro
-        function addFilter(etiqueta) {
-            const existingBadge = selectedFilters.querySelector(`span[data-id='${etiqueta.id}']`);
-            if (!existingBadge) {
-                const badge = document.createElement('span');
-                badge.className = 'badge bg-primary me-2';
-                badge.setAttribute('data-id', etiqueta.id);
-                badge.textContent = etiqueta.nombre;
-
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'btn-close btn-close-white btn-remove-filter';
-                removeBtn.setAttribute('aria-label', 'Close');
-                removeBtn.onclick = function() {
-                    badge.remove();
-                };
-
-                badge.appendChild(removeBtn);
-                selectedFilters.appendChild(badge);
-                filterInput.value = '';  // Limpiar la barra de búsqueda
-                filterResults.style.display = 'none';  // Ocultar los resultados
+        // Manejar el envío del formulario
+        const form = document.getElementById('search-form');
+        form.addEventListener('submit', function(event) {
+            const filters = Array.from(selectedFilters.querySelectorAll('span[data-id]'));
+            const filterIds = filters.map(badge => badge.getAttribute('data-id'));
+            if (filterIds.length > 0) {
+                const queryString = new URLSearchParams(new FormData(form));
+                queryString.append('etiquetas', filterIds.join(','));
+                form.action = ?${queryString.toString()}; // Establecer la acción del formulario
             }
-        }
+        });
     });
 </script>
 {% endblock %}
