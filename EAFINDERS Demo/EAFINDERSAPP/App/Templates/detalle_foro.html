@@ -1,0 +1,73 @@
+{% extends 'Template.html' %}
+
+{% block title %}{{ foro.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ foro.titulo }}</h1>
+    <p>{{ foro.descripcion }}</p>
+    <small class="text-muted">Por {{ foro.autor.nombres }} {{ foro.autor.apellidos }} el {{ foro.fecha_creacion }}</small>
+
+    <h3 class="mt-4">Comentarios</h3>
+    <ul class="list-group">
+        {% for comentario in comentarios %}
+            <li class="list-group-item {% if comentario.autor == request.user %}bg-light{% endif %}">
+                <div>
+                    <strong>{{ comentario.autor.nombres }} {{ comentario.autor.apellidos }}</strong>
+                    <p>{{ comentario.contenido }}</p>
+                    <small class="text-muted">{{ comentario.fecha_creacion }}</small>
+
+                    <!-- Botón para mostrar/ocultar respuestas -->
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#respuestas-{{ comentario.id }}">
+                        Respuestas ({{ comentario.respuestas.count }})
+                    </button>
+                    <div class="collapse" id="respuestas-{{ comentario.id }}">
+                        <ul class="list-group mt-2">
+                            {% for respuesta in comentario.respuestas.all %}
+                                <li class="list-group-item {% if respuesta.autor == request.user %}bg-light{% endif %}">
+                                    <strong>{{ respuesta.autor.nombres }} {{ respuesta.autor.apellidos }}</strong> - {{ respuesta.contenido }}
+                                    <small class="text-muted">{{ respuesta.fecha_creacion }}</small>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item">No hay respuestas aún.</li>
+                            {% endfor %}
+                        </ul>
+
+                        <!-- Formulario para agregar una respuesta -->
+                        <button class="btn btn-secondary" onclick="toggleRespuestaForm('form-respuesta-{{ comentario.id }}')">Responder</button>
+                        <div id="form-respuesta-{{ comentario.id }}" style="display:none;">
+                            <form method="POST" class="mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="parent_id" value="{{ comentario.id }}">
+                                {{ form.as_p }}
+                                <button type="submit" class="btn btn-secondary">Enviar Respuesta</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No hay comentarios aún.</li>
+        {% endfor %}
+    </ul>
+
+    <h4 class="mt-4">Añadir un comentario</h4>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Añadir comentario</button>
+    </form>
+</div>
+
+<!-- Agrega tu JavaScript aquí -->
+<script>
+    function toggleRespuestaForm(formId) {
+        var form = document.getElementById(formId);
+        if (form.style.display === "none") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

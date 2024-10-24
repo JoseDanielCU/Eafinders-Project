@@ -1,0 +1,14 @@
+{% extends 'Template.html' %}
+
+{% block title %}Crear Foro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Crear un nuevo foro</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Crear Foro</button>
+    </form>
+</div>
+{% endblock %}

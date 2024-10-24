@@ -21,5 +21,8 @@ urlpatterns = [
     path('conversaciones/', views.lista_conversaciones, name='lista_conversaciones'),
     path('chat/<int:amigo_id>/', views.chat_view, name='chat_view'),
     path('chat/<int:amigo_id>/obtener-mensajes/', views.obtener_mensajes, name='obtener_mensajes'),
+    path('crear_foro/', views.crear_foro, name='crear_foro'),
+    path('foro/<int:foro_id>/', views.detalle_foro, name='detalle_foro'),
+    path('foros/', views.lista_foros, name='lista_foros'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

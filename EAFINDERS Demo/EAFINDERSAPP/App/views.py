@@ -1,6 +1,6 @@
-from .models import Usuario, Amistad, Mensaje
+from .models import Usuario, Amistad, Mensaje, Foro, Comentario
 from django.contrib.auth import login as auth_login, authenticate, logout
-from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm, BuscarUsuarioForm
+from .forms import RegistroUsuarioForm, LoginForm, EditarPerfilForm, BuscarUsuarioForm, ForoForm, ComentarioForm
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -116,28 +116,29 @@ def registro_usuario(request):
     return render(request, 'Register.html', {'form': form})
 
 def buscar_usuarios(request):
-    query = request.GET.get('query', None)
-    usuarios = None
-    mensaje = None
+    form = BuscarUsuarioForm(request.GET)
+    usuarios = Usuario.objects.all()
 
-    if query:
-        # Search in the fields of name, surname, or email
-        usuarios = Usuario.objects.filter(
-            Q(nombres__icontains=query) |
-            Q(apellidos__icontains=query) |
-            Q(email_institucional__icontains=query)
-        )
+    if form.is_valid():
+        query = form.cleaned_data.get('query')
+        carrera = form.cleaned_data.get('carrera')
+        semestre = form.cleaned_data.get('semestre')
 
-        # If no results
-        if not usuarios.exists():
-            mensaje = "No se encontraron coincidencias."
+        if query:
+            usuarios = usuarios.filter(
+                Q(nombres__icontains=query) |
+                Q(apellidos__icontains=query) |
+                Q(email_institucional__icontains=query)
+            )
 
-    context = {
-        'usuarios': usuarios,
-        'mensaje': mensaje
-    }
+        if carrera:
+            usuarios = usuarios.filter(carrera=carrera)
 
-    return render(request, 'buscar_usuarios.html', context)
+        if semestre:
+            usuarios = usuarios.filter(semestre=semestre)
+
+    return render(request, 'buscar_usuarios.html', {'form': form, 'usuarios': usuarios})
+
 
 @login_required
 def enviar_solicitud_amistad(request, user_id):
@@ -248,3 +249,41 @@ def lista_conversaciones(request):
     )
     return render(request, 'lista_Chats.html', {'amigos': amigos})
 
+
+@login_required
+def crear_foro(request):
+    if request.method == 'POST':
+        form = ForoForm(request.POST)
+        if form.is_valid():
+            foro = form.save(commit=False)
+            foro.creador = request.user  # Asigna el usuario autenticado como creador
+            foro.save()
+            return redirect('detalle_foro', foro_id=foro.id)  # Redirige a la página del foro creado
+    else:
+        form = ForoForm()
+
+    return render(request, 'crear_foro.html', {'form': form})
+@login_required
+def detalle_foro(request, foro_id):
+    foro = get_object_or_404(Foro, id=foro_id)
+    comentarios = foro.comentarios.filter(parent=None)  # Solo comentarios de nivel superior
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            contenido = form.cleaned_data['contenido']
+            parent_id = request.POST.get('parent_id')  # Obtenemos el parent_id
+            comentario = Comentario(
+                foro=foro,
+                autor=request.user,
+                contenido=contenido,
+                parent=Comentario.objects.get(id=parent_id) if parent_id else None  # Usamos el objeto Comentario o None
+            )
+            comentario.save()
+            return redirect('detalle_foro', foro_id=foro.id)
+    else:
+        form = ComentarioForm()
+    return render(request, 'detalle_foro.html', {'foro': foro, 'comentarios': comentarios, 'form': form})
+
+def lista_foros(request):
+    foros = Foro.objects.all().order_by('-fecha_creacion')
+    return render(request, 'lista_foros.html', {'foros': foros})

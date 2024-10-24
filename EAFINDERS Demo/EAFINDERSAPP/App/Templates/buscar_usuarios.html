@@ -52,14 +52,34 @@
 
 {% block content %}
     <!-- Barra de búsqueda -->
-    <form class="d-flex search-bar" method="GET" action="{% url 'buscar_usuarios' %}">
-        <input class="form-control me-2" type="search" name="query" value="{{ request.GET.query }}" placeholder="Buscar usuario..." aria-label="Search" required>
-        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+    <form class="row g-2 search-bar" method="GET" action="{% url 'buscar_usuarios' %}">
+        <div class="col-md-4">
+            <input class="form-control" type="search" name="query" value="{{ request.GET.query }}" placeholder="Buscar por nombre, apellido o email..." aria-label="Search">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="carrera">
+                <option value="">Todas las carreras</option>
+                {% for value, display in form.carrera.field.choices %}
+                    <option value="{{ value }}" {% if request.GET.carrera == value %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="semestre">
+                <option value="">Todos los semestres</option>
+                {% for value, display in form.semestre.field.choices %}
+                    <option value="{{ value }}" {% if request.GET.semestre == value %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-outline-primary w-100" type="submit">Buscar</button>
+        </div>
     </form>
 
     <!-- Resultados de la búsqueda -->
     {% if usuarios %}
-        <h5>Resultados de la búsqueda:</h5>
+        <h5 class="mt-4">Resultados de la búsqueda:</h5>
         <ul class="list-group">
             {% for usuario in usuarios %}
                 <li class="list-group-item user-list-item">
@@ -85,3 +105,4 @@
         </div>
     {% endif %}
 {% endblock %}
+

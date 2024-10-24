@@ -1,11 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import RegexValidator
-from django.db.models import Q
-from django.conf import settings
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
+from django.utils import timezone
 
 class Amistad(models.Model):
     user1 = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='amigos_user1', on_delete=models.CASCADE)
@@ -86,3 +84,20 @@ class Mensaje(models.Model):
 
     def __str__(self):
         return f'Mensaje de {self.remitente} a {self.destinatario}'
+class Foro(models.Model):
+    titulo = models.CharField(max_length=255)
+    descripcion = models.TextField()
+    creador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo
+class Comentario(models.Model):
+    foro = models.ForeignKey(Foro, on_delete=models.CASCADE, related_name='comentarios')
+    autor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    contenido = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='respuestas')
+
+    def __str__(self):
+        return f'Comentario de {self.autor} en {self.foro}'
