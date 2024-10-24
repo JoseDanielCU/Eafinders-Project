@@ -11,61 +11,50 @@
     {% block extra_styles %}{% endblock %}
     <style>
         /* Estilos generales del modo oscuro */
-            /* Estilos generales del modo oscuro */
-    body.dark-mode {
-        background-color: #121212;
-        color: #ffffff !important; /* El texto general debe ser blanco en modo oscuro */
-        transition: background-color 0.3s, color 0.3s;
-    }
-
-    .navbar.dark-mode {
-        background-color: #1c1c1c;
-    }
-
-    .container.dark-mode {
-        background-color: #1c1c1c;
-        color: #ffffff !important; /* Asegúrate de que el texto sea blanco */
-    }
-
-    /* Estilos específicos para las tarjetas y textos en el modo oscuro */
-    .dark-mode .dark-card {
-        background-color: #2c2c2c !important;
-        border-color: #444 !important;
-    }
-
-    .dark-mode .dark-card-body {
-        color: #ffffff !important; /* Forzar el texto a ser blanco */
-    }
-
-    .dark-mode .dark-text {
-        color: #ffffff !important; /* Asegúrate de que el texto sea blanco */
-    }
-
-    .dark-mode .dark-muted {
-        color: #888 !important; /* Texto muted más claro para modo oscuro */
-    }
-
-    .dark-mode a.text-dark {
-        color: #ffffff !important; /* Enlace de texto oscuro en modo oscuro */
-    }
-
-    .dark-mode .btn-outline-primary {
-        color: #ffffff !important; /* Botón debe tener texto blanco en modo oscuro */
-        border-color: #ffffff !important; /* Borde del botón debe ser blanco */
-    }
-
-    .dark-mode .btn-outline-primary:hover {
-        background-color: #ffffff !important; /* Cambia el fondo al hacer hover en modo oscuro */
-        color: #000000 !important; /* Texto del botón en hover debe ser negro */
-    }
         body.dark-mode {
             background-color: #121212;
-            color: #ffffff;
-            transition: background-color 0.3s, color 0.3s; /* Transición para el fondo y texto */
+            color: #ffffff !important; /* El texto general debe ser blanco en modo oscuro */
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .navbar.dark-mode {
             background-color: #1c1c1c;
+        }
+
+        .container.dark-mode {
+            background-color: #1c1c1c;
+            color: #ffffff !important;
+        }
+
+        .dark-mode .dark-card {
+            background-color: #2c2c2c !important;
+            border-color: #444 !important;
+        }
+
+        .dark-mode .dark-card-body {
+            color: #ffffff !important;
+        }
+
+        .dark-mode .dark-text {
+            color: #ffffff !important;
+        }
+
+        .dark-mode .dark-muted {
+            color: #888 !important;
+        }
+
+        .dark-mode a.text-dark {
+            color: #ffffff !important;
+        }
+
+        .dark-mode .btn-outline-primary {
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+        }
+
+        .dark-mode .btn-outline-primary:hover {
+            background-color: #ffffff !important;
+            color: #000000 !important;
         }
 
         .profile-pic-navbar {
@@ -74,33 +63,25 @@
             border-radius: 50%;
         }
 
-        /* Estilos del icono del modo oscuro */
         #dark-mode-toggle {
             cursor: pointer;
-            background: none; /* Sin fondo */
-            border: none; /* Sin borde */
-            padding: 0; /* Sin padding */
-            color: inherit; /* Heredar color del texto */
-            font-size: 1.5rem; /* Tamaño del icono */
-            margin-left: 10px; /* Espaciado a la izquierda */
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit;
+            font-size: 1.5rem;
+            margin-left: 10px;
         }
 
-        .container.dark-mode {
-            background-color: #1c1c1c;
-            color: #ffffff;
-            transition: background-color 0.3s, color 0.3s; /* Transición para el fondo y texto en contenedor */
-        }
-
-        /* Estilos de transición para elementos de la lista de usuarios */
         .user-list-item {
             display: flex;
             align-items: center;
             padding: 10px;
-            transition: background-color 0.3s; /* Transición para el fondo de los elementos de la lista */
+            transition: background-color 0.3s;
         }
 
         .user-list-item:hover {
-            background-color: #333; /* Color de fondo al pasar el ratón */
+            background-color: #333;
         }
     </style>
 </head>
@@ -108,16 +89,18 @@
     {% load static %}
     <!-- Barra de Navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-               <a class="navbar-brand" href="{% url 'home' %}">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- Sección del logo -->
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
                 <img src="{% static 'logo.png' %}" alt="Logo" style="max-width: 150px; height: auto;">
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+
+            <div class="collapse navbar-collapse justify-content-between align-items-center" id="navbarNav">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
@@ -126,12 +109,13 @@
                     </li>
                     <li class="nav-item">
                         <span id="dark-mode-toggle">
-                            <i class="fas fa-sun" id="toggle-icon"></i> <!-- Icono de sol por defecto -->
+                            <i class="fas fa-sun" id="toggle-icon"></i>
                         </span>
                     </li>
                 </ul>
-                <!-- Barra de Búsqueda -->
-                <form class="d-flex search-bar" method="GET" action="{% url 'buscar_usuarios' %}">
+
+                <!-- Barra de búsqueda -->
+                <form class="d-flex search-bar mx-auto" style="max-width: 600px; width: 100%;" method="GET" action="{% url 'buscar_usuarios' %}">
                     <input class="form-control me-2" type="search" name="query" placeholder="Buscar usuario..." aria-label="Search" required>
                     <button class="btn btn-outline-light" type="submit">Buscar</button>
                 </form>
@@ -150,7 +134,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link position-relative" href="{% url 'Notificaciones' %}">
-                                <i class="fas fa-bell"></i> <!-- Icono de campana -->
+                                <i class="fas fa-bell"></i>
                                 {% if notificaciones_count > 0 %}
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                         {{ notificaciones_count }}
@@ -164,7 +148,6 @@
                         </li>
                         <li class="nav-item">
                             <button class="btn btn-danger" id="logout-btn">Cerrar sesión</button>
-                            <!-- Formulario oculto que se enviará con JS -->
                             <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
                                 {% csrf_token %}
                             </form>
@@ -192,32 +175,24 @@
         document.getElementById('logout-btn').addEventListener('click', function() {
             document.getElementById('logout-form').submit();
         });
-    </script>
-    <script>
-        // Comprobar si el modo oscuro está habilitado en el almacenamiento local
+
         document.addEventListener('DOMContentLoaded', function() {
             const isDarkMode = localStorage.getItem('dark-mode') === 'true';
             const body = document.body;
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             const toggleIcon = document.getElementById('toggle-icon');
 
-            // Aplicar modo oscuro si está habilitado
             if (isDarkMode) {
                 body.classList.add('dark-mode');
-                toggleIcon.classList.remove('fa-sun'); // Cambiar el icono a luna
+                toggleIcon.classList.remove('fa-sun');
                 toggleIcon.classList.add('fa-moon');
             }
 
-            // Cambiar entre modo claro y oscuro al hacer clic en el icono
             darkModeToggle.addEventListener('click', function() {
                 body.classList.toggle('dark-mode');
                 const isDarkModeEnabled = body.classList.contains('dark-mode');
-
-                // Cambiar el icono del botón
                 toggleIcon.classList.toggle('fa-sun', !isDarkModeEnabled);
                 toggleIcon.classList.toggle('fa-moon', isDarkModeEnabled);
-
-                // Guardar preferencia en el almacenamiento local
                 localStorage.setItem('dark-mode', isDarkModeEnabled);
             });
         });
