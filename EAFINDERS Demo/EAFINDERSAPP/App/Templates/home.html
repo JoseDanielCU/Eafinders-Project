@@ -20,35 +20,42 @@
         background-color: #007bff; /* Color del botón */
         border-color: #007bff; /* Borde del botón */
     }
+    /* Barra superior: ajuste de margen */
+    .navbar {
+        margin-bottom: 20px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h1 class="display-4 text-center">Home</h1>
-    <p class="lead text-center">Bienvenido a EAFINDERS</p>
+    <div class="container">
+        <h1 class="display-4 text-center mt-4">Home</h1>
+        <p class="lead text-center">Bienvenido a EAFINDERS</p>
 
-    <h2 class="mt-5">Usuarios Registrados:</h2>
-    <div class="row">
-        {% for user in users %}
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body d-flex flex-column align-items-center">
-                        {% if user.foto_perfil %}
-                            <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-                        {% else %}
-                            <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-                        {% endif %}
-                        <h5 class="card-title">{{ user.nombres }} {{ user.apellidos }}</h5>
-                        <a href="{% url 'profile' user.id %}" class="btn btn-primary">Ver Perfil</a>
+        <h2 class="mt-5">Usuarios Registrados:</h2>
+        <!-- Sistema de grilla mejorado para adaptabilidad -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for user in users %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body text-center d-flex flex-column align-items-center">
+                            {% if user.foto_perfil %}
+                                <img src="{{ user.foto_perfil.url }}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'default_profile.jpg' %}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                            <h5 class="card-title">{{ user.nombres }} {{ user.apellidos }}</h5>
+                            <a href="{% url 'profile' user.id %}" class="btn btn-primary mt-auto">Ver Perfil</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% empty %}
-            <div class="col-12">
-                <div class="alert alert-warning text-center" role="alert">
-                    No hay otros usuarios registrados.
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-warning text-center" role="alert">
+                        No hay otros usuarios registrados.
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
