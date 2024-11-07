@@ -66,7 +66,7 @@ ROOT_URLCONF = 'EAFINDERSAPP.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'App/Templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
