@@ -302,9 +302,14 @@ def lista_foros(request):
             Q(fecha_creacion__icontains=query)
         )
 
-    # Filtrar foros según las etiquetas seleccionadas
+    # Filtrar foros según las etiquetas seleccionadas (lógica "OR" entre etiquetas)
     if etiquetas_ids:
-        foros = foros.filter(etiquetas__id__in=etiquetas_ids).distinct()
+        # Crear una lista de Q() para cada etiqueta seleccionada y combinar con OR
+        etiquetas_q = Q()
+        for etiqueta_id in etiquetas_ids:
+            etiquetas_q |= Q(etiquetas__id=etiqueta_id)
+        # Filtrar los foros aplicando la condición OR sobre las etiquetas
+        foros = foros.filter(etiquetas_q).distinct()
 
     # Obtener todas las etiquetas para el filtro
     etiquetas = Etiqueta.objects.all()

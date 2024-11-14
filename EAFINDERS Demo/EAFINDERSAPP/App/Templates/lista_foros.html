@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}Foros{% endblock %}
+
 {% block content %}
 <div class="container my-4">
     <h1 class="mb-4">Foros</h1>
@@ -19,7 +20,8 @@
                 {% for etiqueta in etiquetas %}
                     {% if etiqueta.id|stringformat:"s" == tag_id %}
                         <span class="badge bg-primary me-2" data-id="{{ etiqueta.id }}">
-                            {{ etiqueta.nombre }} <button type="button" class="btn-close btn-close-white btn-remove-filter" aria-label="Close"></button>
+                            {{ etiqueta.nombre }}
+                            <button type="button" class="btn-close btn-close-white btn-remove-filter" aria-label="Close"></button>
                         </span>
                     {% endif %}
                 {% endfor %}
@@ -31,10 +33,15 @@
             <label for="etiquetas">Filtrar por etiquetas:</label>
             <select id="filter-select" name="etiquetas" class="form-select" multiple>
                 {% for etiqueta in etiquetas %}
-                    <option value="{{ etiqueta.id }}">{{ etiqueta.nombre }}</option>
+                    <option value="{{ etiqueta.id }}" {% if etiqueta.id|stringformat:"s" in etiquetas_lista %}selected{% endif %}>
+                        {{ etiqueta.nombre }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
+
+        <!-- Botón para eliminar todos los filtros -->
+        <button type="button" id="clear-filters-btn" class="btn btn-danger mt-3" style="display: {% if etiquetas_lista %}inline-block{% else %}none{% endif %};">Eliminar todos los filtros</button>
     </form>
 
     <a href="{% url 'crear_foro' %}" class="btn btn-primary mb-3">Crear nuevo foro</a>
@@ -66,49 +73,91 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterSelect = document.getElementById('filter-select');
-        const selectedFilters = document.getElementById('selected-filters');
-        const searchInput = document.getElementById('search-input');
+document.addEventListener('DOMContentLoaded', function() {
+    const filterSelect = document.getElementById('filter-select');
+    const selectedFilters = document.getElementById('selected-filters');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+    const form = document.getElementById('search-form');
 
-        // Manejar el cambio en el select de filtros
-        filterSelect.addEventListener('change', function() {
-            const selectedOptions = Array.from(this.selectedOptions);
-            selectedOptions.forEach(option => {
-                // Agregar el filtro como un badge
-                if (!document.querySelector(span[data-id='${option.value}'])) {
-                    const badge = document.createElement('span');
-                    badge.className = 'badge bg-primary me-2';
-                    badge.setAttribute('data-id', option.value);
-                    badge.textContent = option.textContent;
+    // Inicia selectedFilterIds con etiquetas seleccionadas al cargar la página
+    let selectedFilterIds = Array.from(selectedFilters.children).map(badge => badge.getAttribute('data-id'));
 
-                    const removeBtn = document.createElement('button');
-                    removeBtn.type = 'button';
-                    removeBtn.className = 'btn-close btn-close-white btn-remove-filter';
-                    removeBtn.setAttribute('aria-label', 'Close');
-                    removeBtn.onclick = function() {
-                        badge.remove();
-                        // Eliminar la opción seleccionada
-                        option.selected = false;
-                    };
+    // Función para actualizar los filtros seleccionados visualmente y en la lista
+    function updateSelectedFilters() {
+        Array.from(filterSelect.selectedOptions).forEach(option => {
+            const id = option.value;
+            const name = option.textContent;
 
-                    badge.appendChild(removeBtn);
-                    selectedFilters.appendChild(badge);
-                }
-            });
-        });
+            // Agregar el filtro a la lista solo si aún no está
+            if (!selectedFilterIds.includes(id)) {
+                selectedFilterIds.push(id);
 
-        // Manejar el envío del formulario
-        const form = document.getElementById('search-form');
-        form.addEventListener('submit', function(event) {
-            const filters = Array.from(selectedFilters.querySelectorAll('span[data-id]'));
-            const filterIds = filters.map(badge => badge.getAttribute('data-id'));
-            if (filterIds.length > 0) {
-                const queryString = new URLSearchParams(new FormData(form));
-                queryString.append('etiquetas', filterIds.join(','));
-                form.action = ?${queryString.toString()}; // Establecer la acción del formulario
+                // Crear un badge para el filtro seleccionado
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary me-2';
+                badge.setAttribute('data-id', id);
+                badge.textContent = name;
+
+                // Botón para eliminar el filtro
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn-close btn-close-white btn-remove-filter';
+                removeBtn.setAttribute('aria-label', 'Close');
+                removeBtn.onclick = function() {
+                    badge.remove();
+                    option.selected = false;
+                    removeFilter(id);
+                };
+
+                badge.appendChild(removeBtn);
+                selectedFilters.appendChild(badge);
+                toggleClearButton();
             }
         });
+    }
+
+    // Función para eliminar un filtro de la lista y actualizar la visualización
+    function removeFilter(id) {
+        selectedFilterIds = selectedFilterIds.filter(filterId => filterId !== id);
+        toggleClearButton();
+    }
+
+    // Evento para manejar cambios en el select y actualizar la visualización
+    filterSelect.addEventListener('change', updateSelectedFilters);
+
+    // Función para limpiar todos los filtros
+    clearFiltersBtn.addEventListener('click', function() {
+        selectedFilters.innerHTML = '';
+        Array.from(filterSelect.options).forEach(option => option.selected = false);
+        selectedFilterIds = []; // Reiniciar la lista de filtros seleccionados
+        toggleClearButton();
     });
+
+    // Función para mostrar/ocultar el botón "Eliminar todos los filtros"
+    function toggleClearButton() {
+        clearFiltersBtn.style.display = selectedFilterIds.length > 0 ? 'inline-block' : 'none';
+    }
+
+    // Al enviar el formulario, actualizar la URL con los filtros seleccionados
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Evitar el envío directo
+
+        // Generar la URL con los filtros seleccionados en el orden en que fueron añadidos
+        const queryString = new URLSearchParams(new FormData(form));
+        queryString.delete('etiquetas'); // Eliminar filtros previos en la URL
+
+        selectedFilterIds.forEach(id => {
+            queryString.append('etiquetas', id);
+        });
+
+        // Redireccionar con la URL actualizada
+        window.location.href = "?" + queryString.toString();
+    });
+
+    // Inicializar la visualización de los filtros si ya están seleccionados
+    updateSelectedFilters();
+});
+
 </script>
+
 {% endblock %}

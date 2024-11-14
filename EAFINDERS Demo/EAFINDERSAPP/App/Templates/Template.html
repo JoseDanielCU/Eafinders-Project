@@ -176,28 +176,28 @@
             document.getElementById('logout-form').submit();
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-        const body = document.body;
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const toggleIcon = document.getElementById('toggle-icon');
+document.addEventListener('DOMContentLoaded', function() {
+    const body = document.body;
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const toggleIcon = document.getElementById('toggle-icon');
 
-        // Carga el estado del modo oscuro de localStorage
-        const isDarkMode = localStorage.getItem('dark-mode') === 'true';
-        if (isDarkMode) {
-            body.classList.add('dark-mode');
-            toggleIcon.classList.remove('fa-sun');
-            toggleIcon.classList.add('fa-moon');
-        }
+    // Carga el estado del modo oscuro de localStorage
+    const isDarkMode = localStorage.getItem('dark-mode') === 'true';
+    if (isDarkMode) {
+        body.classList.add('dark-mode');
+        toggleIcon.classList.remove('fa-sun');
+        toggleIcon.classList.add('fa-moon');
+    }
 
-        // Alternar el modo oscuro al hacer clic
-        darkModeToggle.addEventListener('click', function() {
-            body.classList.toggle('dark-mode');
-            const isDarkModeEnabled = body.classList.contains('dark-mode');
-            toggleIcon.classList.toggle('fa-sun', !isDarkModeEnabled);
-            toggleIcon.classList.toggle('fa-moon', isDarkModeEnabled);
-            localStorage.setItem('dark-mode', isDarkModeEnabled);
-        });
+    // Alternar el modo oscuro al hacer clic
+    darkModeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        const isDarkModeEnabled = body.classList.contains('dark-mode');
+        toggleIcon.classList.toggle('fa-sun', !isDarkModeEnabled);
+        toggleIcon.classList.toggle('fa-moon', isDarkModeEnabled);
+        localStorage.setItem('dark-mode', isDarkModeEnabled);
     });
+});
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

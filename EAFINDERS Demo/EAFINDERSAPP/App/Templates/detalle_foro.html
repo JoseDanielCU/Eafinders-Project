@@ -140,7 +140,17 @@
         background-color: #2c2f33;
         border: 1px solid #444;
     }
+        /* Modo oscuro */
+    .dark-mode .form-container textarea {
+        background-color: #3c4043; /* Fondo oscuro para el modo oscuro */
+        color: #f8f9fa; /* Texto claro */
+    }
 
+    /* Modo claro */
+    .light-mode .form-container textarea {
+        background-color: #ffffff; /* Fondo blanco para el modo claro */
+        color: #333; /* Texto oscuro */
+    }
     .form-container {
         position: relative;
         display: flex;
@@ -234,12 +244,18 @@
 
                     <!-- Formulario de respuesta oculto -->
                     <div id="form-respuesta-{{ comentario.id }}" style="display:none;">
-                        <form method="POST" class="mt-2">
-                            {% csrf_token %}
-                            <input type="hidden" name="parent_id" value="{{ comentario.id }}">
-                            <textarea name="contenido" class="form-control dark-card-body" rows="2" placeholder="Añade una respuesta..."></textarea>
-                            <button type="submit" class="btn btn-secondary mt-1">Enviar Respuesta</button>
-                        </form>
+                        {% if user.is_authenticated %}
+                            <form method="POST" class="mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="parent_id" value="{{ comentario.id }}">
+                                <textarea name="contenido" class="form-control" rows="2" placeholder="Añade una respuesta..."></textarea>
+                                <button type="submit" class="btn btn-secondary mt-1">Enviar Respuesta</button>
+                            </form>
+                        {% else %}
+                           <p class="text-muted">
+                            <a href="{% url 'login' %}">Inicia sesión para poder comentar</a>
+                           </p>
+                        {% endif %}
                     </div>
                 </div>
             </li>
@@ -249,27 +265,33 @@
     </ul>
 
     <!-- Barra de comentario compacta y dinámica -->
-    <form method="POST" enctype="multipart/form-data" class="border p-2 rounded bg shadow-sm sticky-bar">
-        {% csrf_token %}
+    {% if user.is_authenticated %}
+        <form method="POST" enctype="multipart/form-data" class="border p-2 rounded bg shadow-sm sticky-bar">
+            {% csrf_token %}
 
-        <!-- Vista previa de la imagen (solo se muestra si hay imagen) -->
-        <div id="image-preview" class="d-flex justify-content-between" style="display:none;">
-            <img id="preview" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
-            <button type="button" class="btn-remove-preview" onclick="removeImage()">×</button>
-        </div>
+            <!-- Vista previa de la imagen (solo se muestra si hay imagen) -->
+            <div id="image-preview" class="d-flex justify-content-between" style="display:none;">
+                <img id="preview" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                <button type="button" class="btn-remove-preview" onclick="removeImage()">×</button>
+            </div>
 
-        <!-- Campo de texto para el comentario -->
-        <div class="input-group w-100 mt-2">
-            <textarea name="contenido" id="id_contenido" class="form-control" rows="1" placeholder="Añade un comentario..." required></textarea>
-            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('id_archivo').click();">
-                <i class="bi bi-arrow-up"></i>
-            </button>
-            <input type="file" name="archivo" id="id_archivo" class="d-none" accept="image/*" onchange="previewImage(event)">
-        </div>
+            <!-- Campo de texto para el comentario -->
+            <div class="input-group w-100 mt-2">
+                <textarea name="contenido" id="id_contenido" class="form-control" rows="1" placeholder="Añade un comentario..." required></textarea>
+                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('id_archivo').click();">
+                    <i class="bi bi-arrow-up"></i>
+                </button>
+                <input type="file" name="archivo" id="id_archivo" class="d-none" accept="image/*" onchange="previewImage(event)">
+            </div>
 
-        <!-- Botón para enviar el comentario -->
-        <button type="submit" class="btn btn-primary mt-2 w-100">Enviar Comentario</button>
-    </form>
+            <!-- Botón para enviar el comentario -->
+            <button type="submit" class="btn btn-primary mt-2 w-100">Enviar Comentario</button>
+        </form>
+    {% else %}
+        <p class="text-muted">
+            <a href="{% url 'login' %}">Inicia sesión para poder comentar</a>
+        </p>
+    {% endif %}
 </div>
 
 <script>
@@ -278,30 +300,29 @@
         form.style.display = (form.style.display === 'none') ? 'block' : 'none';
     }
 
-function previewImage(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    const previewImg = document.getElementById('preview');
-    const imagePreview = document.getElementById('image-preview');
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        const previewImg = document.getElementById('preview');
+        const imagePreview = document.getElementById('image-preview');
 
-    if (file) {
-        reader.onload = function() {
-            previewImg.src = reader.result;
-            imagePreview.style.display = 'flex'; // Mostrar la vista previa
-        };
-        reader.readAsDataURL(file);
-    } else {
-        removeImage();
+        if (file) {
+            reader.onload = function() {
+                previewImg.src = reader.result;
+                imagePreview.style.display = 'flex'; // Mostrar la vista previa
+            };
+            reader.readAsDataURL(file);
+        } else {
+            removeImage();
+        }
     }
-}
 
-function removeImage() {
-    const fileInput = document.getElementById('id_archivo');
-    fileInput.value = '';
-    document.getElementById('preview').src = '';
-    document.getElementById('image-preview').style.display = 'none'; // Ocultar la vista previa
-}
-
+    function removeImage() {
+        const fileInput = document.getElementById('id_archivo');
+        fileInput.value = '';
+        document.getElementById('preview').src = '';
+        document.getElementById('image-preview').style.display = 'none'; // Ocultar la vista previa
+    }
 </script>
 
 {% endblock %}

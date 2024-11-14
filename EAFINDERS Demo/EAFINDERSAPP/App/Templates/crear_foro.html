@@ -2,9 +2,45 @@
 
 {% block title %}Crear Foro{% endblock %}
 
+{% block extra_styles %}
+<style>
+/* Estilo para campos de texto en modo oscuro */
+.dark-card-body input,
+.dark-card-body textarea {
+    background-color: #333; /* Fondo oscuro */
+    color: #fff; /* Texto claro */
+    border: 1px solid #444; /* Bordes oscuros */
+}
+
+.dark-card-body::placeholder {
+    color: #bbb; /* Color del texto del marcador en modo oscuro */
+}
+
+/* Asegurando que el texto dentro de los campos sea visible y legible */
+.dark-card-body {
+    background-color: #333 !important; /* Fondo oscuro para los campos de texto */
+    color: #fff !important; /* Texto blanco dentro de los campos */
+}
+
+/* Estilo de la tarjeta en modo oscuro */
+.dark-mode .dark-card {
+    background-color: #2c2c2c !important;
+    border-color: #444 !important;
+}
+
+.dark-mode .dark-card-body {
+    color: #ffffff !important;
+}
+
+.dark-mode .text-dark-mode {
+    color: #ffffff !important;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Crear un nuevo foro</h2>
+    <h2 class="mb-4 text-dark-mode">Crear un nuevo foro</h2>
     <form method="post" enctype="multipart/form-data" class="border p-4 rounded bg-light shadow-sm dark-card">
         {% csrf_token %}
         {{ form.non_field_errors }}
