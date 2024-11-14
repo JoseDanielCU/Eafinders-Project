@@ -265,7 +265,7 @@ def crear_foro(request):
     return render(request, 'crear_foro.html', {'form': form})
 def detalle_foro(request, foro_id):
     foro = get_object_or_404(Foro, id=foro_id)
-    comentarios = foro.comentarios.filter(parent=None)  # Solo comentarios principales (sin respuestas)
+    comentarios = foro.comentarios.filter(parent=None).order_by('-fecha_creacion')  # Solo comentarios principales (sin respuestas)
 
     if request.method == 'POST':
         form = ComentarioForm(request.POST, request.FILES)  # Incluye request.FILES
